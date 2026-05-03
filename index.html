@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MKT WiFi — Painel de Gestão</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0f1a;
+      --surface: #161928;
+      --surface2: #1e2236;
+      --border: #2a2f4a;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --accent4: #ffa94d;
+      --text: #e8eaf6;
+      --muted: #7b82a6;
+      --success: #00d4aa;
+      --warning: #ffa94d;
+      --danger: #ff6b6b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-text { font-size: 16px; font-weight: 700; color: var(--text); }
+    .logo-sub { font-size: 10px; color: var(--muted); font-weight: 400; }
+
+    .nav { margin-top: 16px; flex: 1; }
+    .nav-section { padding: 8px 20px 4px; font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px;
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      cursor: pointer; border-left: 3px solid transparent;
+      transition: all .2s;
+    }
+    .nav-item:hover { color: var(--text); background: var(--surface2); }
+    .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(108,99,255,.08); }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-badge {
+      margin-left: auto; background: var(--accent);
+      color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600;
+    }
+    .nav-badge.warn { background: var(--warning); }
+
+    .sidebar-bottom { padding: 16px 20px; border-top: 1px solid var(--border); }
+    .user-card { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+    }
+    .user-name { font-size: 12px; font-weight: 600; }
+    .user-role { font-size: 10px; color: var(--muted); }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      height: 64px; background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 32px; gap: 16px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-size: 18px; font-weight: 700; flex: 1; }
+    .topbar-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,212,170,.1); color: var(--accent2);
+      border: 1px solid rgba(0,212,170,.3);
+      border-radius: 99px; padding: 4px 12px; font-size: 12px; font-weight: 600;
+    }
+    .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--accent2); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .btn {
+      padding: 8px 18px; border-radius: 8px; border: none;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #5a52e0; transform: translateY(-1px); }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--border); }
+
+    /* CONTENT */
+    .content { padding: 32px; display: flex; flex-direction: column; gap: 28px; }
+
+    /* KPI CARDS */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .kpi-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.3); }
+    .kpi-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .kpi-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .kpi-trend { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
+    .trend-up { background: rgba(0,212,170,.15); color: var(--accent2); }
+    .trend-down { background: rgba(255,107,107,.15); color: var(--danger); }
+    .kpi-value { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+    .kpi-label { font-size: 12px; color: var(--muted); }
+
+    /* SECTION HEADERS */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .section-title { font-size: 16px; font-weight: 700; }
+    .section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* GRID 2 COL */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+
+    /* CARD */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+    }
+
+    /* CAMPANHAS TABLE */
+    .table-wrap { overflow-x: auto; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left; font-size: 11px; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    tbody tr { transition: background .15s; cursor: pointer; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 12px; font-size: 13px; border-bottom: 1px solid rgba(42,47,74,.5); }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600;
+    }
+    .status-active { background: rgba(0,212,170,.15); color: var(--success); }
+    .status-paused { background: rgba(255,169,77,.15); color: var(--warning); }
+    .status-ended { background: rgba(123,130,166,.15); color: var(--muted); }
+    .camp-name { font-weight: 600; }
+    .camp-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .action-btn {
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); padding: 4px 10px; border-radius: 6px;
+      font-size: 11px; cursor: pointer; transition: all .15s;
+    }
+    .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* WIFI STATUS */
+    .wifi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px; }
+    .wifi-device {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .wifi-device.online { border-color: rgba(0,212,170,.3); }
+    .wifi-device.offline { border-color: rgba(255,107,107,.2); opacity: .6; }
+    .device-name { font-size: 12px; font-weight: 600; }
+    .device-ip { font-size: 10px; color: var(--muted); font-family: monospace; }
+    .device-bar { height: 4px; border-radius: 99px; background: var(--border); overflow: hidden; }
+    .device-bar-fill { height: 100%; border-radius: 99px; background: var(--accent2); }
+    .device-stats { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+
+    /* USUARIOS RECENTES */
+    .user-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+    .user-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px; border-radius: 10px; background: var(--surface2);
+      border: 1px solid var(--border); transition: all .15s;
+    }
+    .user-row:hover { border-color: var(--accent); }
+    .user-av {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .user-info { flex: 1; }
+    .user-info-name { font-size: 13px; font-weight: 600; }
+    .user-info-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .user-time { font-size: 11px; color: var(--muted); text-align: right; }
+    .time-remain { font-size: 13px; font-weight: 700; color: var(--accent2); }
+
+    /* NOTIFICAÇÕES */
+    .notif-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .notif-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px; border-radius: 10px; background: var(--surface2);
+      border: 1px solid var(--border);
+    }
+    .notif-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .notif-body { flex: 1; }
+    .notif-title { font-size: 13px; font-weight: 600; }
+    .notif-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .notif-time { font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+    /* CONEXÃO FORM CONFIG */
+    .form-preview {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; margin-top: 8px;
+    }
+    .form-field { margin-bottom: 12px; }
+    .form-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+    .form-control {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 12px; color: var(--text);
+      font-family: 'Inter', sans-serif; font-size: 13px;
+    }
+    .form-control:focus { outline: none; border-color: var(--accent); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .config-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(108,99,255,.1); border: 1px solid rgba(108,99,255,.3);
+      color: var(--accent); padding: 4px 10px; border-radius: 6px;
+      font-size: 11px; font-weight: 600; font-family: monospace;
+    }
+
+    /* CHARTS */
+    .mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 60px; margin-top: 12px; }
+    .bar { flex: 1; border-radius: 4px 4px 0 0; background: var(--accent); opacity: .4; transition: opacity .2s; }
+    .bar:hover { opacity: 1; }
+    .bar.today { opacity: .9; }
+
+    /* DEMOGRAPHICS */
+    .demo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .demo-label { font-size: 12px; color: var(--muted); width: 70px; flex-shrink: 0; }
+    .demo-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .demo-bar-fill { height: 100%; border-radius: 99px; }
+    .demo-pct { font-size: 12px; font-weight: 600; width: 35px; text-align: right; }
+
+    /* REFERENCIA */
+    .plan-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+    .plan-card {
+      border: 2px solid var(--border); border-radius: 12px; padding: 16px;
+      cursor: pointer; transition: all .2s;
+    }
+    .plan-card:hover, .plan-card.selected {
+      border-color: var(--accent); background: rgba(108,99,255,.06);
+    }
+    .plan-icon { font-size: 22px; margin-bottom: 8px; }
+    .plan-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .plan-desc { font-size: 11px; color: var(--muted); }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+    .tab {
+      padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; color: var(--muted); transition: all .2s;
+    }
+    .tab.active { background: var(--accent); color: #fff; }
+    .tab:hover:not(.active) { background: var(--surface2); color: var(--text); }
+
+    /* TAG */
+    .tag {
+      display: inline-block; padding: 2px 8px; border-radius: 6px;
+      font-size: 10px; font-weight: 600; margin-left: 4px;
+    }
+    .tag-purple { background: rgba(108,99,255,.2); color: var(--accent); }
+    .tag-green { background: rgba(0,212,170,.2); color: var(--accent2); }
+    .tag-orange { background: rgba(255,169,77,.2); color: var(--warning); }
+  </style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">📡</div>
+    <div>
+      <div class="logo-text">MKT WiFi</div>
+      <div class="logo-sub">Plataforma de Gestão</div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showSection('dashboard')">
+      <span class="icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showSection('campanhas')">
+      <span class="icon">📢</span> Campanhas
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="showSection('usuarios')">
+      <span class="icon">👥</span> Usuários
+    </div>
+
+    <div class="nav-section">Operação</div>
+    <div class="nav-item" onclick="showSection('wifi')">
+      <span class="icon">📶</span> Wi-Fi Online
+      <span class="nav-badge warn">12</span>
+    </div>
+    <div class="nav-item" onclick="showSection('conexoes')">
+      <span class="icon">🔗</span> Conexões
+    </div>
+    <div class="nav-item" onclick="showSection('notificacoes')">
+      <span class="icon">🔔</span> Notificações
+    </div>
+
+    <div class="nav-section">Configuração</div>
+    <div class="nav-item" onclick="showSection('relatorios')">
+      <span class="icon">📄</span> Relatórios
+    </div>
+    <div class="nav-item" onclick="showSection('referencia')">
+      <span class="icon">💰</span> Monetização
+    </div>
+    <div class="nav-item" onclick="showSection('config')">
+      <span class="icon">⚙️</span> Configurações
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar">AD</div>
+      <div>
+        <div class="user-name">Admin</div>
+        <div class="user-role">Administrador</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-badge"><div class="dot-live"></div> 12 usuários online</div>
+    <button class="btn btn-ghost">📥 Exportar</button>
+    <button class="btn btn-primary">+ Nova Campanha</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div id="section-dashboard">
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-icon" style="background:rgba(108,99,255,.15)">👥</div>
+            <span class="kpi-trend trend-up">+18%</span>
+          </div>
+          <div class="kpi-value">1.847</div>
+          <div class="kpi-label">Pessoas atingidas este mês</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-icon" style="background:rgba(0,212,170,.15)">📢</div>
+            <span class="kpi-trend trend-up">+2</span>
+          </div>
+          <div class="kpi-value">3</div>
+          <div class="kpi-label">Campanhas ativas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-icon" style="background:rgba(255,169,77,.15)">💵</div>
+            <span class="kpi-trend trend-up">+12%</span>
+          </div>
+          <div class="kpi-value">R$2.340</div>
+          <div class="kpi-label">Investimento total</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-icon" style="background:rgba(255,107,107,.15)">📶</div>
+            <span class="kpi-trend trend-up">ao vivo</span>
+          </div>
+          <div class="kpi-value">12</div>
+          <div class="kpi-label">Dispositivos online agora</div>
+        </div>
+      </div>
+
+      <!-- GRÁFICO + DEMOGRÁFICOS -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Conexões por dia</div>
+              <div class="section-sub">Últimos 7 dias</div>
+            </div>
+            <div class="tabs">
+              <div class="tab active">7d</div>
+              <div class="tab">30d</div>
+            </div>
+          </div>
+          <div class="mini-chart">
+            <div class="bar" style="height:35%"></div>
+            <div class="bar" style="height:55%"></div>
+            <div class="bar" style="height:42%"></div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:60%"></div>
+            <div class="bar" style="height:85%"></div>
+            <div class="bar today" style="height:100%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--muted)">
+            <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span style="color:var(--accent);font-weight:700">Hoje</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">Perfil dos usuários</div>
+          </div>
+          <div style="margin-top:8px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:600">GÊNERO</div>
+            <div class="demo-row">
+              <div class="demo-label">Feminino</div>
+              <div class="demo-bar-wrap"><div class="demo-bar-fill" style="width:58%;background:var(--accent)"></div></div>
+              <div class="demo-pct">58%</div>
+            </div>
+            <div class="demo-row">
+              <div class="demo-label">Masculino</div>
+              <div class="demo-bar-wrap"><div class="demo-bar-fill" style="width:42%;background:var(--accent2)"></div></div>
+              <div class="demo-pct">42%</div>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin:12px 0 8px;font-weight:600">FAIXA ETÁRIA</div>
+            <div class="demo-row">
+              <div class="demo-label">18–24</div>
+              <div class="demo-bar-wrap"><div class="demo-bar-fill" style="width:32%;background:#a78bfa"></div></div>
+              <div class="demo-pct">32%</div>
+            </div>
+            <div class="demo-row">
+              <div class="demo-label">25–34</div>
+              <div class="demo-bar-wrap"><div class="demo-bar-fill" style="width:41%;background:#818cf8"></div></div>
+              <div class="demo-pct">41%</div>
+            </div>
+            <div class="demo-row">
+              <div class="demo-label">35–50</div>
+              <div class="demo-bar-wrap"><div class="demo-bar-fill" style="width:20%;background:#6366f1"></div></div>
+              <div class="demo-pct">20%</div>
+            </div>
+            <div class="demo-row">
+              <div class="demo-label">50+</div>
+              <div class="demo-bar-wrap"><div class="demo-bar-fill" style="width:7%;background:#4f46e5"></div></div>
+              <div class="demo-pct">7%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPANHAS + USUARIOS -->
+      <div class="grid-3">
+        <div class="card">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Campanhas ativas</div>
+              <div class="section-sub">Gerencie seus vídeos e materiais</div>
+            </div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px">+ Criar</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Campanha</th>
+                  <th>Vídeo</th>
+                  <th>Alcance</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="camp-name">Campanha Verão 24</div>
+                    <div class="camp-meta">Bairro: Centro • 30s</div>
+                  </td>
+                  <td><span class="tag tag-purple">YouTube</span></td>
+                  <td><strong>842</strong></td>
+                  <td><span class="status-pill status-active">● Ativa</span></td>
+                  <td><button class="action-btn">Editar</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="camp-name">Promoção Loja X</div>
+                    <div class="camp-meta">Zona Norte • 25s</div>
+                  </td>
+                  <td><span class="tag tag-green">Upload</span></td>
+                  <td><strong>631</strong></td>
+                  <td><span class="status-pill status-active">● Ativa</span></td>
+                  <td><button class="action-btn">Editar</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="camp-name">Evento Municipal</div>
+                    <div class="camp-meta">Praça Central • 60s</div>
+                  </td>
+                  <td><span class="tag tag-purple">YouTube</span></td>
+                  <td><strong>374</strong></td>
+                  <td><span class="status-pill status-paused">⏸ Pausada</span></td>
+                  <td><button class="action-btn">Editar</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="camp-name">Natal 2023</div>
+                    <div class="camp-meta">Geral • 30s</div>
+                  </td>
+                  <td><span class="tag tag-green">Upload</span></td>
+                  <td><strong>1.203</strong></td>
+                  <td><span class="status-pill status-ended">✓ Encerrada</span></td>
+                  <td><button class="action-btn">Ver</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">Conectados agora</div>
+          </div>
+          <div class="user-list">
+            <div class="user-row">
+              <div class="user-av" style="background:linear-gradient(135deg,#6c63ff,#a78bfa)">MA</div>
+              <div class="user-info">
+                <div class="user-info-name">Maria A.</div>
+                <div class="user-info-meta">F • 28 anos • Centro</div>
+              </div>
+              <div class="user-time">
+                <div class="time-remain">18:32</div>
+                <div>restante</div>
+              </div>
+            </div>
+            <div class="user-row">
+              <div class="user-av" style="background:linear-gradient(135deg,#00d4aa,#06b6d4)">JS</div>
+              <div class="user-info">
+                <div class="user-info-name">João S.</div>
+                <div class="user-info-meta">M • 35 anos • Zona Norte</div>
+              </div>
+              <div class="user-time">
+                <div class="time-remain">07:14</div>
+                <div>restante</div>
+              </div>
+            </div>
+            <div class="user-row">
+              <div class="user-av" style="background:linear-gradient(135deg,#ff6b6b,#ffa94d)">CL</div>
+              <div class="user-info">
+                <div class="user-info-name">Carla L.</div>
+                <div class="user-info-meta">F • 22 anos • Sul</div>
+              </div>
+              <div class="user-time">
+                <div class="time-remain">25:00</div>
+                <div>restante</div>
+              </div>
+            </div>
+            <div class="user-row">
+              <div class="user-av" style="background:linear-gradient(135deg,#f59e0b,#d97706)">RP</div>
+              <div class="user-info">
+                <div class="user-info-name">Roberto P.</div>
+                <div class="user-info-meta">M • 41 anos • Leste</div>
+              </div>
+              <div class="user-time">
+                <div class="time-remain">02:45</div>
+                <div style="color:var(--danger)">expira em breve</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CAMPANHAS ══ -->
+    <div id="section-campanhas" style="display:none">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Campanhas</div>
+          <div class="section-sub">Gerencie vídeos, materiais e dados de cada campanha</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="tabs" style="margin-bottom:0">
+            <div class="tab active" onclick="campView('cards',this)">🃏 Cards</div>
+            <div class="tab" onclick="campView('table',this)">📋 Tabela</div>
+          </div>
+          <button class="btn btn-primary">+ Nova Campanha</button>
+        </div>
+      </div>
+
+      <!-- KPIs campanha -->
+      <div class="kpi-grid" style="margin-bottom:24px">
+        <div class="kpi-card">
+          <div class="kpi-header"><div class="kpi-icon" style="background:rgba(0,212,170,.15)">📢</div><span class="kpi-trend trend-up">3 ativas</span></div>
+          <div class="kpi-value">6</div>
+          <div class="kpi-label">Total de campanhas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header"><div class="kpi-icon" style="background:rgba(108,99,255,.15)">▶️</div><span class="kpi-trend trend-up">+23%</span></div>
+          <div class="kpi-value">4.296</div>
+          <div class="kpi-label">Total de visualizações</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header"><div class="kpi-icon" style="background:rgba(255,169,77,.15)">💵</div><span class="kpi-trend trend-up">+12%</span></div>
+          <div class="kpi-value">R$5.800</div>
+          <div class="kpi-label">Receita gerada</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header"><div class="kpi-icon" style="background:rgba(255,107,107,.15)">📊</div><span class="kpi-trend trend-up">78%</span></div>
+          <div class="kpi-value">78%</div>
+          <div class="kpi-label">Taxa de conclusão do vídeo</div>
+        </div>
+      </div>
+
+      <!-- CARDS VIEW -->
+      <div id="camp-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+
+        <!-- Card 1 -->
+        <div class="card" style="border-color:rgba(0,212,170,.3);cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div style="font-size:15px;font-weight:700">Campanha Verão 24</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">📍 Centro • criada em 15/01/2024</div>
+            </div>
+            <span class="status-pill status-active">● Ativa</span>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;border:1px dashed var(--border);font-size:28px">▶️</div>
+          <div style="display:flex;gap:6px;margin-bottom:14px">
+            <span class="tag tag-purple">YouTube</span>
+            <span class="tag tag-orange">30 seg</span>
+            <span class="tag tag-green">+30 min acesso</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent2)">842</div>
+              <div style="font-size:10px;color:var(--muted)">Views</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent)">81%</div>
+              <div style="font-size:10px;color:var(--muted)">Concluído</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--warning)">R$1.2k</div>
+              <div style="font-size:10px;color:var(--muted)">Receita</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">✏️ Editar</button>
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">📊 Ver dados</button>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card" style="border-color:rgba(0,212,170,.3);cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div style="font-size:15px;font-weight:700">Promoção Loja X</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">📍 Zona Norte • criada em 02/03/2024</div>
+            </div>
+            <span class="status-pill status-active">● Ativa</span>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;border:1px dashed var(--border);font-size:28px">🎬</div>
+          <div style="display:flex;gap:6px;margin-bottom:14px">
+            <span class="tag tag-green">Upload</span>
+            <span class="tag tag-orange">25 seg</span>
+            <span class="tag tag-green">+30 min acesso</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent2)">631</div>
+              <div style="font-size:10px;color:var(--muted)">Views</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent)">76%</div>
+              <div style="font-size:10px;color:var(--muted)">Concluído</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--warning)">R$950</div>
+              <div style="font-size:10px;color:var(--muted)">Receita</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">✏️ Editar</button>
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">📊 Ver dados</button>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card" style="border-color:rgba(0,212,170,.3);cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div style="font-size:15px;font-weight:700">Festival de Páscoa</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">📍 Praça da Sé • criada em 20/03/2024</div>
+            </div>
+            <span class="status-pill status-active">● Ativa</span>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;border:1px dashed var(--border);font-size:28px">🐣</div>
+          <div style="display:flex;gap:6px;margin-bottom:14px">
+            <span class="tag tag-purple">YouTube</span>
+            <span class="tag tag-orange">45 seg</span>
+            <span class="tag tag-green">+30 min acesso</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent2)">247</div>
+              <div style="font-size:10px;color:var(--muted)">Views</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent)">83%</div>
+              <div style="font-size:10px;color:var(--muted)">Concluído</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--warning)">R$600</div>
+              <div style="font-size:10px;color:var(--muted)">Receita</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">✏️ Editar</button>
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">📊 Ver dados</button>
+          </div>
+        </div>
+
+        <!-- Card 4 - Pausada -->
+        <div class="card" style="border-color:rgba(255,169,77,.25);cursor:pointer;transition:all .2s;opacity:.85" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div style="font-size:15px;font-weight:700">Evento Municipal</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">📍 Praça Central • criada em 10/11/2023</div>
+            </div>
+            <span class="status-pill status-paused">⏸ Pausada</span>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;border:1px dashed var(--border);font-size:28px">🎪</div>
+          <div style="display:flex;gap:6px;margin-bottom:14px">
+            <span class="tag tag-purple">YouTube</span>
+            <span class="tag tag-orange">60 seg</span>
+            <span class="tag tag-green">+30 min acesso</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent2)">374</div>
+              <div style="font-size:10px;color:var(--muted)">Views</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent)">65%</div>
+              <div style="font-size:10px;color:var(--muted)">Concluído</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--warning)">R$800</div>
+              <div style="font-size:10px;color:var(--muted)">Receita</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">▶️ Reativar</button>
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">📊 Ver dados</button>
+          </div>
+        </div>
+
+        <!-- Card 5 - Encerrada -->
+        <div class="card" style="opacity:.55;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div style="font-size:15px;font-weight:700">Natal 2023</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">📍 Geral • criada em 01/12/2023</div>
+            </div>
+            <span class="status-pill status-ended">✓ Encerrada</span>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;border:1px dashed var(--border);font-size:28px">🎄</div>
+          <div style="display:flex;gap:6px;margin-bottom:14px">
+            <span class="tag tag-green">Upload</span>
+            <span class="tag tag-orange">30 seg</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent2)">1.203</div>
+              <div style="font-size:10px;color:var(--muted)">Views</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent)">88%</div>
+              <div style="font-size:10px;color:var(--muted)">Concluído</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--warning)">R$2.1k</div>
+              <div style="font-size:10px;color:var(--muted)">Receita</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">📋 Duplicar</button>
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">📊 Relatório</button>
+          </div>
+        </div>
+
+        <!-- Card 6 - Encerrada -->
+        <div class="card" style="opacity:.55;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div style="font-size:15px;font-weight:700">Lançamento App</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">📍 Zona Sul • criada em 05/08/2023</div>
+            </div>
+            <span class="status-pill status-ended">✓ Encerrada</span>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;border:1px dashed var(--border);font-size:28px">📱</div>
+          <div style="display:flex;gap:6px;margin-bottom:14px">
+            <span class="tag tag-green">Upload</span>
+            <span class="tag tag-orange">20 seg</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent2)">999</div>
+              <div style="font-size:10px;color:var(--muted)">Views</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--accent)">72%</div>
+              <div style="font-size:10px;color:var(--muted)">Concluído</div>
+            </div>
+            <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:800;color:var(--warning)">R$1.5k</div>
+              <div style="font-size:10px;color:var(--muted)">Receita</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">📋 Duplicar</button>
+            <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:6px">📊 Relatório</button>
+          </div>
+        </div>
+
+      </div><!-- /camp-cards -->
+
+      <!-- TABLE VIEW -->
+      <div id="camp-table" style="display:none">
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Campanha</th>
+                  <th>Local</th>
+                  <th>Vídeo</th>
+                  <th>Duração</th>
+                  <th>Views</th>
+                  <th>Concluído</th>
+                  <th>Receita</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="camp-name">Campanha Verão 24</div><div class="camp-meta">15/01/2024</div></td>
+                  <td>Centro</td>
+                  <td><span class="tag tag-purple">YouTube</span></td>
+                  <td>30s</td>
+                  <td><strong>842</strong></td>
+                  <td><span style="color:var(--accent2);font-weight:700">81%</span></td>
+                  <td><strong>R$1.200</strong></td>
+                  <td><span class="status-pill status-active">● Ativa</span></td>
+                  <td><button class="action-btn">Editar</button></td>
+                </tr>
+                <tr>
+                  <td><div class="camp-name">Promoção Loja X</div><div class="camp-meta">02/03/2024</div></td>
+                  <td>Zona Norte</td>
+                  <td><span class="tag tag-green">Upload</span></td>
+                  <td>25s</td>
+                  <td><strong>631</strong></td>
+                  <td><span style="color:var(--accent2);font-weight:700">76%</span></td>
+                  <td><strong>R$950</strong></td>
+                  <td><span class="status-pill status-active">● Ativa</span></td>
+                  <td><button class="action-btn">Editar</button></td>
+                </tr>
+                <tr>
+                  <td><div class="camp-name">Festival de Páscoa</div><div class="camp-meta">20/03/2024</div></td>
+                  <td>Praça da Sé</td>
+                  <td><span class="tag tag-purple">YouTube</span></td>
+                  <td>45s</td>
+                  <td><strong>247</strong></td>
+                  <td><span style="color:var(--accent2);font-weight:700">83%</span></td>
+                  <td><strong>R$600</strong></td>
+                  <td><span class="status-pill status-active">● Ativa</span></td>
+                  <td><button class="action-btn">Editar</button></td>
+                </tr>
+                <tr>
+                  <td><div class="camp-name">Evento Municipal</div><div class="camp-meta">10/11/2023</div></td>
+                  <td>Praça Central</td>
+                  <td><span class="tag tag-purple">YouTube</span></td>
+                  <td>60s</td>
+                  <td><strong>374</strong></td>
+                  <td><span style="color:var(--warning);font-weight:700">65%</span></td>
+                  <td><strong>R$800</strong></td>
+                  <td><span class="status-pill status-paused">⏸ Pausada</span></td>
+                  <td><button class="action-btn">Reativar</button></td>
+                </tr>
+                <tr>
+                  <td><div class="camp-name">Natal 2023</div><div class="camp-meta">01/12/2023</div></td>
+                  <td>Geral</td>
+                  <td><span class="tag tag-green">Upload</span></td>
+                  <td>30s</td>
+                  <td><strong>1.203</strong></td>
+                  <td><span style="color:var(--accent2);font-weight:700">88%</span></td>
+                  <td><strong>R$2.100</strong></td>
+                  <td><span class="status-pill status-ended">✓ Encerrada</span></td>
+                  <td><button class="action-btn">Duplicar</button></td>
+                </tr>
+                <tr>
+                  <td><div class="camp-name">Lançamento App</div><div class="camp-meta">05/08/2023</div></td>
+                  <td>Zona Sul</td>
+                  <td><span class="tag tag-green">Upload</span></td>
+                  <td>20s</td>
+                  <td><strong>999</strong></td>
+                  <td><span style="color:var(--warning);font-weight:700">72%</span></td>
+                  <td><strong>R$1.500</strong></td>
+                  <td><span class="status-pill status-ended">✓ Encerrada</span></td>
+                  <td><button class="action-btn">Duplicar</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /camp-table -->
+    </div>
+
+    <!-- ══ WI-FI ONLINE ══ -->
+    <div id="section-wifi" style="display:none">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Wi-Fi Online</div>
+          <div class="section-sub">Status em tempo real dos seus equipamentos</div>
+        </div>
+        <button class="btn btn-ghost">🔄 Atualizar</button>
+      </div>
+
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi-card">
+          <div class="kpi-header"><div class="kpi-icon" style="background:rgba(0,212,170,.15)">📶</div></div>
+          <div class="kpi-value" style="color:var(--accent2)">2</div>
+          <div class="kpi-label">Equipamentos online</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header"><div class="kpi-icon" style="background:rgba(255,107,107,.15)">⚠️</div></div>
+          <div class="kpi-value" style="color:var(--danger)">1</div>
+          <div class="kpi-label">Equipamentos offline</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header"><div class="kpi-icon" style="background:rgba(108,99,255,.15)">👥</div></div>
+          <div class="kpi-value">12</div>
+          <div class="kpi-label">Dispositivos conectados</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-header"><div class="kpi-icon" style="background:rgba(255,169,77,.15)">⬆️</div></div>
+          <div class="kpi-value">48 Mb</div>
+          <div class="kpi-label">Uso de banda agora</div>
+        </div>
+      </div>
+
+      <div class="wifi-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card wifi-device online">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div class="device-name">📡 MikroTik hAP ac² — Praça Central</div>
+            <span class="status-pill status-active" style="font-size:10px">● Online</span>
+          </div>
+          <div class="device-ip">IP: 192.168.88.1 • MAC: AA:BB:CC:11:22:33</div>
+          <div style="margin:10px 0 4px;font-size:10px;color:var(--muted)">CPU 24% • RAM 48%</div>
+          <div class="device-bar"><div class="device-bar-fill" style="width:24%"></div></div>
+          <div class="device-stats" style="margin-top:6px">
+            <span>7 usuários</span>
+            <span>↑12 Mb/s ↓6 Mb/s</span>
+          </div>
+        </div>
+
+        <div class="card wifi-device online">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div class="device-name">📡 MikroTik hAP ac² — Feira da Laje</div>
+            <span class="status-pill status-active" style="font-size:10px">● Online</span>
+          </div>
+          <div class="device-ip">IP: 192.168.89.1 • MAC: AA:BB:CC:44:55:66</div>
+          <div style="margin:10px 0 4px;font-size:10px;color:var(--muted)">CPU 61% • RAM 72%</div>
+          <div class="device-bar"><div class="device-bar-fill" style="width:61%;background:var(--warning)"></div></div>
+          <div class="device-stats" style="margin-top:6px">
+            <span>5 usuários</span>
+            <span>↑28 Mb/s ↓8 Mb/s</span>
+          </div>
+        </div>
+
+        <div class="card wifi-device offline">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div class="device-name">📡 MikroTik SXT — Campo Aberto</div>
+            <span class="status-pill" style="background:rgba(255,107,107,.15);color:var(--danger);font-size:10px">● Offline</span>
+          </div>
+          <div class="device-ip">IP: 192.168.90.1 • MAC: AA:BB:CC:77:88:99</div>
+          <div style="margin:10px 0 4px;font-size:10px;color:var(--muted)">Última vez visto: há 2h 14min</div>
+          <div class="device-bar"><div class="device-bar-fill" style="width:0%;background:var(--danger)"></div></div>
+          <div class="device-stats" style="margin-top:6px">
+            <span>0 usuários</span>
+            <span style="color:var(--danger)">Sem conexão</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ NOTIFICAÇÕES ══ -->
+    <div id="section-notificacoes" style="display:none">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Notificações e Alertas</div>
+          <div class="section-sub">Configuração de canais e alertas automáticos</div>
+        </div>
+        <button class="btn btn-primary">+ Nova Regra</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">Regras de Notificação</div>
+          <div class="notif-list">
+            <div class="notif-item">
+              <div class="notif-icon">💬</div>
+              <div class="notif-body">
+                <div class="notif-title">WhatsApp — Expiração de acesso</div>
+                <div class="notif-desc">Avisa o usuário 5 min antes do acesso acabar</div>
+              </div>
+              <div style="margin-left:auto"><span class="status-pill status-active">● Ativa</span></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon">📧</div>
+              <div class="notif-body">
+                <div class="notif-title">Email — Relatório diário</div>
+                <div class="notif-desc">Envia resumo de conexões todo dia às 20h</div>
+              </div>
+              <div style="margin-left:auto"><span class="status-pill status-active">● Ativa</span></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon">🔴</div>
+              <div class="notif-body">
+                <div class="notif-title">WhatsApp — Equipamento offline</div>
+                <div class="notif-desc">Alerta imediato quando um MikroTik cair</div>
+              </div>
+              <div style="margin-left:auto"><span class="status-pill status-active">● Ativa</span></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon">📢</div>
+              <div class="notif-body">
+                <div class="notif-title">Email — Nova campanha disponível</div>
+                <div class="notif-desc">Notifica grupo de clientes sobre novo vídeo</div>
+              </div>
+              <div style="margin-left:auto"><span class="status-pill status-paused">⏸ Pausada</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">Grupos de Notificação</div>
+          <div class="notif-list">
+            <div class="notif-item">
+              <div class="notif-icon">👥</div>
+              <div class="notif-body">
+                <div class="notif-title">Grupo: Anunciantes</div>
+                <div class="notif-desc">3 membros • Relatórios + ROI</div>
+              </div>
+              <button class="action-btn">Editar</button>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon">🔧</div>
+              <div class="notif-body">
+                <div class="notif-title">Grupo: Operação</div>
+                <div class="notif-desc">2 membros • Alertas técnicos</div>
+              </div>
+              <button class="action-btn">Editar</button>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon">📊</div>
+              <div class="notif-body">
+                <div class="notif-title">Grupo: Comercial</div>
+                <div class="notif-desc">5 membros • Leads e conversões</div>
+              </div>
+              <button class="action-btn">Editar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONEXÕES (FORMULÁRIO) ══ -->
+    <div id="section-conexoes" style="display:none">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Tela de Conexão — Configuração</div>
+          <div class="section-sub">Formulário exibido ao usuário no captive portal</div>
+        </div>
+        <button class="btn btn-primary">💾 Salvar</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">Campos do Formulário</div>
+          <div class="form-preview">
+            <div class="form-field">
+              <div class="form-label">NOME COMPLETO</div>
+              <input class="form-control" type="text" placeholder="Ex: Maria Silva" />
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <div class="form-label">TELEFONE (WHATSAPP)</div>
+                <input class="form-control" type="text" placeholder="(11) 99999-9999" />
+              </div>
+              <div class="form-field">
+                <div class="form-label">EMAIL</div>
+                <input class="form-control" type="email" placeholder="email@exemplo.com" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <div class="form-label">BAIRRO / ZONA</div>
+                <select class="form-control">
+                  <option>Centro</option>
+                  <option>Zona Norte</option>
+                  <option>Zona Sul</option>
+                  <option>Zona Leste</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <div class="form-label">FAIXA ETÁRIA</div>
+                <select class="form-control">
+                  <option>18–24</option>
+                  <option>25–34</option>
+                  <option>35–50</option>
+                  <option>50+</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="form-label">GÊNERO</div>
+              <select class="form-control">
+                <option>Feminino</option>
+                <option>Masculino</option>
+                <option>Prefiro não informar</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px">Configuração MikroTik</div>
+          <div class="form-preview">
+            <div class="form-field">
+              <div class="form-label">IP DO MIKROTIK</div>
+              <input class="form-control" type="text" value="192.168.88.1" style="font-family:monospace"/>
+            </div>
+            <div class="form-field">
+              <div class="form-label">PORTA DA API</div>
+              <input class="form-control" type="text" value="8728" style="font-family:monospace"/>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <div class="form-label">USUÁRIO API</div>
+                <input class="form-control" type="text" value="admin" style="font-family:monospace"/>
+              </div>
+              <div class="form-field">
+                <div class="form-label">SENHA API</div>
+                <input class="form-control" type="password" value="••••••" />
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="form-label">TEMPO DE SESSÃO (minutos)</div>
+              <input class="form-control" type="number" value="30" />
+            </div>
+            <div style="margin-top:14px;display:flex;flex-wrap:gap;gap:8px">
+              <span class="config-badge">📡 Redirecionar para: 192.168.88.1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MONETIZAÇÃO ══ -->
+    <div id="section-referencia" style="display:none">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Monetização</div>
+          <div class="section-sub">Defina como cobrar pelo serviço</div>
+        </div>
+      </div>
+
+      <div class="card" style="max-width:700px">
+        <div class="section-title" style="margin-bottom:6px">Modelo de cobrança</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Escolha como rentabilizar sua operação</div>
+        <div class="plan-cards">
+          <div class="plan-card selected">
+            <div class="plan-icon">▶️</div>
+            <div class="plan-name">Por visualização</div>
+            <div class="plan-desc">Cobra por cada vídeo assistido. Ideal para anunciantes que pagam por CPV (custo por view).</div>
+          </div>
+          <div class="plan-card">
+            <div class="plan-icon">⏱️</div>
+            <div class="plan-name">Por pacote de tempo</div>
+            <div class="plan-desc">Cobra pacotes fechados (ex: 10h de wi-fi = R$50). O anunciante paga pelo período.</div>
+          </div>
+          <div class="plan-card">
+            <div class="plan-icon">🔀</div>
+            <div class="plan-name">Híbrido (view + tempo)</div>
+            <div class="plan-desc">Combina os dois modelos. Cobra por view E por tempo mínimo de campanha ativa.</div>
+          </div>
+          <div class="plan-card">
+            <div class="plan-icon">📋</div>
+            <div class="plan-name">Plano fixo mensal</div>
+            <div class="plan-desc">Anunciante paga mensalidade fixa para estar na plataforma com vídeo ativo.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+  const sections = ['dashboard','campanhas','usuarios','wifi','conexoes','notificacoes','relatorios','referencia','config'];
+  const titles = {
+    dashboard: 'Dashboard', campanhas: 'Campanhas', usuarios: 'Usuários',
+    wifi: 'Wi-Fi Online', conexoes: 'Conexões', notificacoes: 'Notificações',
+    relatorios: 'Relatórios', referencia: 'Monetização', config: 'Configurações'
+  };
+
+  function showSection(name) {
+    sections.forEach(s => {
+      const el = document.getElementById('section-' + s);
+      if (el) el.style.display = (s === name) ? '' : 'none';
+    });
+    document.getElementById('page-title').textContent = titles[name] || name;
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    event && event.currentTarget && event.currentTarget.classList.add('active');
+  }
+
+  function campView(view, el) {
+    document.getElementById('camp-cards').style.display = view === 'cards' ? 'grid' : 'none';
+    document.getElementById('camp-table').style.display = view === 'table' ? '' : 'none';
+    el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // plan card selection
+  document.querySelectorAll('.plan-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+
+  // tab selection
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      tab.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
