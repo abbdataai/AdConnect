@@ -1,0 +1,236 @@
+schema_version: "1.0"
+domain: react
+file_type: api-reference
+last_validated: "2026-03-13"
+source: "react.dev, tanstack.com/query/v5, react-hook-form.com, zustand docs"
+
+# ─── React 19 New APIs ──────────────────────────────────────────────────────
+
+react_19_new_apis:
+
+  use:
+    description: "Read a Promise or Context during render. Unlike hooks, can be called conditionally and after early returns."
+    signature: "function use<T>(resource: Promise<T> | Context<T>): T"
+    notes:
+      - "Suspends the component until Promise resolves"
+      - "Works inside conditions, loops, and early returns"
+      - "Prefer useSuspenseQuery (TanStack) for data fetching over raw use(Promise)"
+
+  useActionState:
+    description: "Manage state and pending status for form actions / async mutations. Replaces manual useState for action results."
+    signature: "function useActionState<TState, TFormData>(action: (prevState: TState, formData: TFormData) => Promise<TState>, initialState: TState, permalink?: string): [state: TState, dispatch: React.Dispatch<TFormData>, isPending: boolean]"
+    notes:
+      - "action receives current state + formData; returns next state"
+      - "isPending is true while action is executing"
+      - "Can be used with <form action={dispatch}> for progressive enhancement"
+
+  useFormStatus:
+    description: "Read the pending state of the parent <form> from a child component without prop drilling."
+    signature: "function useFormStatus(): { pending: boolean; data: FormData | null; method: string | null; action: string | ((formData: FormData) => void) | null }"
+    source_module: "react-dom"
+    notes:
+      - "Must be used inside a <form> element"
+      - "Use in a SubmitButton child component to disable during submission"
+
+  useOptimistic:
+    description: "Apply an optimistic state update immediately while an async action is in-flight. Automatically reverts on error."
+    signature: "function useOptimistic<TState, TAction>(state: TState, updateFn: (currentState: TState, optimisticValue: TAction) => TState): [optimisticState: TState, addOptimistic: (action: TAction) => void]"
+    notes:
+      - "On success: optimistic state becomes the real state"
+      - "On error: React automatically reverts to the previous state"
+      - "Ideal for like/follow buttons, real-time chat"
+
+# ─── All Built-in Hooks ──────────────────────────────────────────────────────
+
+builtin_hooks:
+
+  useState:
+    signature: "function useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>]"
+    use: "Local component state"
+
+  useEffect:
+    signature: "function useEffect(effect: () => void | (() => void), deps?: DependencyList): void"
+    use: "Side effects: subscriptions, DOM manipulation, timers. Return cleanup function."
+
+  useLayoutEffect:
+    signature: "function useLayoutEffect(effect: () => void | (() => void), deps?: DependencyList): void"
+    use: "Synchronous layout measurements before paint. Prefer useEffect."
+
+  useReducer:
+    signature: "function useReducer<S, A>(reducer: (state: S, action: A) => S, initialState: S): [S, Dispatch<A>]"
+    use: "Complex state with multiple sub-values or next state depends on previous"
+
+  useRef:
+    signature: "function useRef<T>(initialValue: T): MutableRefObject<T>"
+    use: "DOM references, mutable values that don't trigger re-render"
+
+  useContext:
+    signature: "function useContext<T>(context: Context<T>): T"
+    use: "Read nearest Context value without prop drilling"
+
+  useMemo:
+    signature: "function useMemo<T>(factory: () => T, deps: DependencyList): T"
+    use: "Cache expensive computation result. Profile before adding."
+
+  useCallback:
+    signature: "function useCallback<T extends Function>(callback: T, deps: DependencyList): T"
+    use: "Cache function identity for memoized children or effect deps. Profile first."
+
+  useTransition:
+    signature: "function useTransition(): [isPending: boolean, startTransition: TransitionStartFunction]"
+    use: "Mark state updates as non-urgent (interruptible). You own the setter."
+
+  useDeferredValue:
+    signature: "function useDeferredValue<T>(value: T): T"
+    use: "Defer re-rendering of slow subtree. Receive a value you don't own."
+
+  useId:
+    signature: "function useId(): string"
+    use: "Generate stable unique ID for accessibility (aria-labelledby, htmlFor)"
+
+  useImperativeHandle:
+    signature: "function useImperativeHandle<T>(ref: Ref<T>, init: () => T, deps?: DependencyList): void"
+    use: "Expose custom imperative API via ref (e.g., focus(), scroll())"
+
+  useDebugValue:
+    signature: "function useDebugValue<T>(value: T, format?: (value: T) => unknown): void"
+    use: "Display custom label for custom hook in React DevTools"
+
+  useSyncExternalStore:
+    signature: "function useSyncExternalStore<T>(subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => T, getServerSnapshot?: () => T): T"
+    use: "Subscribe to external stores (state managers, browser APIs)"
+
+  use_react19:
+    signature: "function use<T>(resource: Promise<T> | Context<T>): T"
+    use: "Read Promise or Context. Works conditionally. Suspends on Promise."
+
+  useActionState_react19:
+    signature: "function useActionState<S, P>(action: (state: S, payload: P) => Promise<S>, initial: S): [S, Dispatch<P>, boolean]"
+    use: "Form/action state management with built-in pending flag"
+
+  useOptimistic_react19:
+    signature: "function useOptimistic<S, A>(state: S, updateFn: (state: S, action: A) => S): [S, (action: A) => void]"
+    use: "Optimistic UI updates that auto-revert on error"
+
+# ─── TypeScript Generic Patterns ─────────────────────────────────────────────
+
+typescript_patterns:
+
+  ComponentProps:
+    description: "Extract props type from any component"
+    example: "type ButtonProps = React.ComponentProps<typeof Button>"
+
+  HTMLAttributes:
+    description: "Extend native HTML element attributes"
+    example: "interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {}"
+
+  PropsWithChildren:
+    description: "Add children to any props type"
+    example: "type CardProps = React.PropsWithChildren<{ title: string }>"
+
+  RefObject:
+    description: "Type for useRef holding a DOM element"
+    example: "const ref = React.useRef<HTMLInputElement>(null)"
+
+  Dispatch_SetStateAction:
+    description: "Type for useState setter"
+    example: "type SetCount = React.Dispatch<React.SetStateAction<number>>"
+
+  ReactNode:
+    description: "Any renderable content (JSX, string, number, null)"
+    example: "children: React.ReactNode"
+
+  ReactElement:
+    description: "JSX element specifically (stricter than ReactNode)"
+    example: "function Wrapper(): React.ReactElement { return <div /> }"
+
+  ForwardRef:
+    description: "Forward ref with typed element and props"
+    example: "React.forwardRef<HTMLInputElement, InputProps>((props, ref) => ...)"
+
+  generic_component:
+    description: "Generic component accepting typed items"
+    example: "function List<T extends { id: string }>({ items }: { items: T[] }) {}"
+
+# ─── Deprecated Patterns to Avoid ────────────────────────────────────────────
+
+deprecated:
+
+  class_components:
+    status: deprecated
+    reason: "Functional components + hooks replace all class use cases"
+    replace_with: "function component + useState/useEffect"
+
+  legacy_context:
+    status: removed_in_19
+    reason: "childContextTypes and getChildContext removed"
+    replace_with: "React.createContext + useContext"
+
+  componentDidMount_equivalent:
+    status: deprecated
+    reason: "useEffect with empty deps array is the functional equivalent"
+    replace_with: "useEffect(() => { /* mount logic */ }, [])"
+
+  componentWillMount:
+    status: removed
+    reason: "Unsafe lifecycle method"
+    replace_with: "useEffect or derive state during render"
+
+  string_refs:
+    status: removed_in_19
+    reason: "Legacy string refs removed in React 19"
+    replace_with: "useRef hook"
+
+  ReactDOM_render:
+    status: removed_in_19
+    reason: "Removed in React 19"
+    replace_with: "ReactDOM.createRoot(el).render(<App />)"
+
+  defaultProps_on_FC:
+    status: deprecated
+    reason: "defaultProps on function components deprecated in React 19"
+    replace_with: "Default parameter values: function Btn({ variant = 'primary' }) {}"
+
+  PropTypes:
+    status: deprecated
+    reason: "TypeScript provides better static type checking"
+    replace_with: "TypeScript interfaces / type aliases"
+
+# ─── TanStack Query v5 Key API ────────────────────────────────────────────────
+
+tanstack_query_v5:
+  major_changes:
+    - "Single-object API: useQuery({ queryKey, queryFn }) — no positional overloads"
+    - "useSuspenseQuery and useSuspenseInfiniteQuery added — data is never undefined"
+    - "Optimistic updates simplified via mutate returned variables"
+    - "Global error type: extend Register interface"
+
+  queryOptions_helper:
+    signature: "function queryOptions<TData>(options: UseQueryOptions<TData>): UseQueryOptions<TData>"
+    use: "Share typed query options; restores type inference when extracting options"
+
+# ─── Zustand v5 Key API ───────────────────────────────────────────────────────
+
+zustand_v5:
+  create_pattern: "create<State>()(middleware((set, get) => ({ ...state })))"
+  middleware_order: "immer → subscribeWithSelector → devtools → persist"
+  typescript_note: "Always use create<T>()() double-call — required for TypeScript"
+  selector_pattern: "useStore((s) => s.specificSlice) — prevents full store subscriptions"
+
+# ─── React Hook Form v7 Key API ──────────────────────────────────────────────
+
+react_hook_form_v7:
+  useForm:
+    generic: "useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })"
+    key_returns: ["register", "handleSubmit", "formState", "watch", "setValue", "reset", "control"]
+
+  validation_modes:
+    - "onSubmit (default)"
+    - "onChange"
+    - "onBlur"
+    - "onTouched"
+    - "all"
+
+  useFieldArray:
+    signature: "useFieldArray({ control, name: 'fieldName' })"
+    key_returns: ["fields", "append", "prepend", "remove", "move", "swap"]

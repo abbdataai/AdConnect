@@ -1,0 +1,43 @@
+Acesso negado
+Administrador
+Anunciante
+Bairro
+CNPJ
+Campanhas
+Configurações
+Conexões
+Email
+Email ou senha incorretos.
+Empresa
+Encerradas
+Encerrada
+Entrar
+Faixa etária
+Frequência
+Gênero
+Imutável por LGPD
+LGPD
+Manter conectado
+MKT WiFi
+Monetização
+Nome
+Notificações
+Online
+Painel do Operador
+Pausadas
+Pausada
+Perfil dos usuários
+Razão social
+Relatórios
+Salvar
+Salvar modelo
+Sair
+Senha
+Solicitar acesso
+Total cadastrados
+Usuários
+Visualizador
+Voltar ao início
+Wi-Fi Online
+Wi-Fi que paga a conta.
+{slice}

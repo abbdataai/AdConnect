@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MKT WiFi · Product Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Palette extracted from notes/MKT WiFi - Full App.html (admin prototype <style> block) */
+    --bg: #0d0f1a;
+    --surface: #161928;
+    --surface2: #1c2038;
+    --surface-elevated: #232842;
+    --border: rgba(108, 99, 255, 0.10);
+    --border-bright: rgba(108, 99, 255, 0.22);
+    --text: #e8eaf6;
+    --text-dim: #7b82a6;
+    --muted-soft: #5a6082;
+
+    --accent: #6c63ff;          /* prototype primary purple */
+    --accent-dim: rgba(108, 99, 255, 0.10);
+    --accent-hover: #8a82ff;
+
+    --gold: #f5c542;            /* gold for highlight CTAs */
+    --gold-dim: rgba(245, 197, 66, 0.10);
+    --green: #00d4aa;           /* prototype success */
+    --green-dim: rgba(0, 212, 170, 0.10);
+    --orange: #ffa94d;          /* prototype warning */
+    --orange-dim: rgba(255, 169, 77, 0.10);
+    --red: #ff6b6b;             /* prototype danger */
+    --red-dim: rgba(255, 107, 107, 0.10);
+    --cyan: #22d3ee;
+    --cyan-dim: rgba(34, 211, 238, 0.10);
+    --silver: #b0bec5;
+    --silver-dim: rgba(176, 190, 197, 0.10);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167, 139, 250, 0.10);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96, 165, 250, 0.10);
+
+    --code-bg: #060b14;
+    --code-text: #c8d8e8;
+
+    --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --font-editorial: 'Newsreader', Georgia, serif;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+
+  /* Subtle film grain */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.025;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  }
+
+  /* Top branding bar */
+  .brand-bar {
+    position: fixed; top: 0; left: 0; right: 0; height: 44px; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(20px, 3vw, 48px);
+    background: rgba(13, 15, 26, 0.85);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    font-family: var(--font-mono);
+    font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .brand-bar__left { color: var(--accent); font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .brand-bar__center { color: var(--gold); font-weight: 500; font-style: italic; letter-spacing: 0.08em; text-transform: none; font-family: var(--font-editorial); font-size: clamp(0.72rem, 0.95vw, 0.85rem); }
+  .brand-bar__right { color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+
+  /* Deck container */
+  .deck { height: 100dvh; overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth; position: relative; z-index: 1; }
+
+  .slide {
+    height: 100dvh;
+    scroll-snap-align: start;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(64px, 9vh, 92px) clamp(36px, 6vw, 96px) clamp(28px, 3.5vh, 44px);
+    isolation: isolate;
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .slide.visible { opacity: 1; transform: none; }
+
+  .slide .reveal {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .slide.visible .reveal { opacity: 1; transform: none; }
+  .slide.visible .reveal:nth-child(1) { transition-delay: 0.10s; }
+  .slide.visible .reveal:nth-child(2) { transition-delay: 0.20s; }
+  .slide.visible .reveal:nth-child(3) { transition-delay: 0.30s; }
+  .slide.visible .reveal:nth-child(4) { transition-delay: 0.40s; }
+  .slide.visible .reveal:nth-child(5) { transition-delay: 0.50s; }
+  .slide.visible .reveal:nth-child(6) { transition-delay: 0.60s; }
+  .slide.visible .reveal:nth-child(7) { transition-delay: 0.70s; }
+  .slide.visible .reveal:nth-child(8) { transition-delay: 0.80s; }
+
+  /* Title slide */
+  .slide--title { text-align: center; align-items: center; }
+  .slide__display {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(48px, 9vw, 124px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+  .gradient-text { background: linear-gradient(135deg, var(--accent) 0%, var(--cyan) 50%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .gradient-gold { background: linear-gradient(135deg, var(--gold) 0%, #fff 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .shimmer-text { background: linear-gradient(90deg, var(--accent) 0%, #fff 50%, var(--gold) 100%); background-size: 200% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 6s ease infinite; }
+  @keyframes shimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+  /* Section heading common */
+  .slide__heading {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(32px, 5.2vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin-bottom: clamp(8px, 1.4vh, 16px);
+  }
+  .slide__eyebrow {
+    font-family: var(--font-mono);
+    font-size: clamp(0.62rem, 0.85vw, 0.74rem);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: clamp(10px, 1.4vh, 18px);
+    display: inline-block;
+  }
+  .slide__lede {
+    font-family: var(--font-editorial);
+    font-style: italic;
+    font-size: clamp(1.05rem, 1.6vw, 1.4rem);
+    color: var(--text-dim);
+    line-height: 1.45;
+    max-width: 78ch;
+  }
+
+  /* Tags */
+  .tag {
+    font-family: var(--font-mono);
+    font-size: clamp(0.6rem, 0.78vw, 0.7rem);
+    font-weight: 600;
+    padding: 0.22rem 0.65rem;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .tag-accent { background: var(--accent-dim); color: var(--accent); }
+  .tag-gold   { background: var(--gold-dim);   color: var(--gold); }
+  .tag-green  { background: var(--green-dim);  color: var(--green); }
+  .tag-orange { background: var(--orange-dim); color: var(--orange); }
+  .tag-red    { background: var(--red-dim);    color: var(--red); }
+  .tag-cyan   { background: var(--cyan-dim);   color: var(--cyan); }
+  .tag-purple { background: var(--purple-dim); color: var(--purple); }
+  .tag-blue   { background: var(--blue-dim);   color: var(--blue); }
+  .tag-silver { background: var(--silver-dim); color: var(--silver); }
+
+  /* Bottom panel pattern */
+  .bottom-bar {
+    margin-top: auto;
+    padding-top: clamp(12px, 2vh, 20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(16px, 3vw, 32px);
+    flex-wrap: wrap;
+  }
+  .bottom-bar__text {
+    font-family: var(--font-editorial);
+    font-size: clamp(0.88rem, 1.15vw, 1.05rem);
+    font-style: italic;
+    color: var(--text-dim);
+    line-height: 1.5;
+    flex: 1;
+    min-width: 280px;
+  }
+  .bottom-bar__text strong { color: var(--accent); font-style: normal; font-family: var(--font-body); font-weight: 600; }
+  .bottom-bar__tags { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+
+  /* Cards / grids */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 2vw, 24px); margin-top: clamp(14px, 2.4vh, 24px); }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 1.6vw, 20px); margin-top: clamp(14px, 2.4vh, 24px); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2.5vw, 32px); margin-top: clamp(14px, 2.4vh, 24px); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: clamp(16px, 2.6vh, 26px) clamp(16px, 2vw, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 0.9vh, 10px);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--border-bright); box-shadow: 0 12px 32px rgba(108, 99, 255, 0.12); }
+  .card h4 { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: clamp(1.2rem, 1.85vw, 1.55rem); color: var(--text); }
+  .card .eyebrow { font-family: var(--font-mono); font-size: clamp(0.6rem, 0.78vw, 0.68rem); font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+  .card p { font-family: var(--font-editorial); font-style: italic; font-size: clamp(0.85rem, 1.1vw, 0.96rem); color: var(--text-dim); line-height: 1.5; }
+  .card ul { list-style: none; display: flex; flex-direction: column; gap: clamp(4px, 0.6vh, 6px); }
+  .card ul li { font-family: var(--font-body); font-size: clamp(0.82rem, 1.05vw, 0.92rem); color: var(--text); line-height: 1.5; padding-left: 14px; position: relative; }
+  .card ul li::before { content: ''; position: absolute; left: 0; top: 0.55em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .card--gold { border-color: rgba(245, 197, 66, 0.22); }
+  .card--gold .eyebrow { color: var(--gold); }
+  .card--gold ul li::before { background: var(--gold); }
+  .card--green { border-color: rgba(0, 212, 170, 0.22); }
+  .card--green .eyebrow { color: var(--green); }
+  .card--green ul li::before { background: var(--green); }
+  .card--red { border-color: rgba(255, 107, 107, 0.22); }
+  .card--red .eyebrow { color: var(--red); }
+  .card--red ul li li::before, .card--red ul li::before { background: var(--red); }
+  .card--cyan { border-color: rgba(34, 211, 238, 0.22); }
+  .card--cyan .eyebrow { color: var(--cyan); }
+
+  .card .price {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .card--gold .price { color: var(--gold); }
+  .card--green .price { color: var(--green); }
+  .card--cyan .price { color: var(--cyan); }
+
+  .card .footnote { margin-top: auto; padding-top: 0.6rem; font-family: var(--font-mono); font-size: clamp(0.6rem, 0.78vw, 0.68rem); color: var(--text-dim); letter-spacing: 0.05em; }
+
+  /* Stat / KPI cards */
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    border-radius: 14px;
+    padding: clamp(16px, 2.6vh, 24px) clamp(16px, 2vw, 22px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.6vh, 8px);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .kpi:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(108, 99, 255, 0.10); }
+  .kpi .num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+  .kpi .lbl { font-family: var(--font-mono); font-size: clamp(0.62rem, 0.82vw, 0.72rem); color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
+  .kpi .delta { font-family: var(--font-mono); font-size: clamp(0.7rem, 0.92vw, 0.8rem); font-weight: 600; }
+  .kpi .delta.up { color: var(--green); }
+  .kpi .delta.live { color: var(--accent); }
+  .kpi .desc { font-family: var(--font-editorial); font-style: italic; font-size: clamp(0.8rem, 1.05vw, 0.9rem); color: var(--text-dim); line-height: 1.5; margin-top: 0.3rem; }
+  .kpi--gold { border-top-color: var(--gold); }
+  .kpi--green { border-top-color: var(--green); }
+  .kpi--cyan { border-top-color: var(--cyan); }
+
+  /* Pulse-glow for hero element */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.3), 0 8px 28px rgba(108, 99, 255, 0.12); }
+    50%      { box-shadow: 0 0 0 14px rgba(108, 99, 255, 0.0), 0 8px 28px rgba(108, 99, 255, 0.20); }
+  }
+  .pulse-glow { animation: pulse-glow 3.2s ease-in-out infinite; }
+
+  /* Radar (title slide) */
+  @keyframes radar-sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .radar-svg { animation: radar-sweep 4s linear infinite; transform-origin: center; }
+
+  /* Hero CTA button */
+  .cta-btn {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    padding: 0.85rem 1.8rem;
+    font-family: var(--font-mono); font-size: clamp(0.8rem, 1vw, 0.92rem); font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    background: linear-gradient(135deg, var(--accent), #8a82ff);
+    color: #fff;
+    border: none; border-radius: 100px;
+    cursor: pointer;
+  }
+
+  /* Forbidden item — strikethrough for LGPD slide */
+  .forbidden { color: var(--red); text-decoration: line-through; text-decoration-color: rgba(255, 107, 107, 0.5); text-decoration-thickness: 1.5px; }
+
+  /* iOS frame stub for portal flow SVG */
+  .ios-frame-fill { fill: #1c2038; stroke: rgba(108, 99, 255, 0.35); stroke-width: 1.5; }
+  .ios-frame-screen { fill: #0d0f1a; }
+
+  /* Deck chrome */
+  .deck-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--gold)); z-index: 101; transition: width 0.3s ease; pointer-events: none; }
+  .deck-counter { position: fixed; bottom: clamp(12px, 2vh, 24px); right: clamp(12px, 2vw, 24px); font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); z-index: 101; }
+  .deck-hints { position: fixed; bottom: clamp(12px, 2vh, 24px); left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); opacity: 0.55; z-index: 101; transition: opacity 0.5s; letter-spacing: 0.08em; }
+  .deck-hints.faded { opacity: 0; pointer-events: none; }
+
+  /* Decorative corner ticks for title slide */
+  .corner-tick { position: absolute; pointer-events: none; }
+
+  /* Compact table */
+  .endpoints-table { width: 100%; border-collapse: collapse; font-size: clamp(0.78rem, 1vw, 0.88rem); margin-top: clamp(10px, 1.4vh, 14px); }
+  .endpoints-table th { font-family: var(--font-mono); font-size: clamp(0.6rem, 0.78vw, 0.68rem); text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); text-align: left; padding: 0.5rem 0.8rem; border-bottom: 2px solid var(--border-bright); }
+  .endpoints-table td { padding: 0.42rem 0.8rem; border-bottom: 1px solid var(--border); color: var(--text); }
+  .endpoints-table td:first-child { font-family: var(--font-display); font-style: italic; color: var(--accent); }
+  .endpoints-table tr:hover td { background: rgba(108, 99, 255, 0.04); }
+  .endpoints-table .row-portal td { background: rgba(245, 197, 66, 0.06); }
+  .endpoints-table .row-portal td:first-child { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- BRANDING BAR -->
+<div class="brand-bar">
+  <div class="brand-bar__left">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+      <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+      <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+      <line x1="12" y1="20" x2="12.01" y2="20"/>
+    </svg>
+    MKT WIFI &middot; PRODUCT OVERVIEW
+  </div>
+  <div class="brand-bar__center">Wi-Fi que paga a conta.</div>
+  <div class="brand-bar__right">
+     &middot; Multi-tenant SaaS
+  </div>
+</div>
+
+<!-- DECK CHROME -->
+<div class="deck-progress" id="progress"></div>
+<div class="deck-counter" id="counter">1 / 15</div>
+<div class="deck-hints" id="hints">&larr; &rarr; setas &middot; ESC para iniciar</div>
+
+<div class="deck" id="deck">
+
+<!-- ============================================================ -->
+<!-- SLIDE 1 — TITLE                                              -->
+<!-- ============================================================ -->
+<section class="slide slide--title">
+
+  <!-- decorative corner ticks -->
+  <svg class="corner-tick" style="top:64px;left:48px;" width="120" height="120" viewBox="0 0 120 120">
+    <line x1="0" y1="0" x2="0" y2="48" stroke="#6c63ff" stroke-width="2" opacity="0.35"/>
+    <line x1="0" y1="0" x2="48" y2="0" stroke="#6c63ff" stroke-width="2" opacity="0.35"/>
+  </svg>
+  <svg class="corner-tick" style="bottom:48px;right:48px;" width="120" height="120" viewBox="0 0 120 120">
+    <line x1="120" y1="72" x2="120" y2="120" stroke="#f5c542" stroke-width="2" opacity="0.35"/>
+    <line x1="72" y1="120" x2="120" y2="120" stroke="#f5c542" stroke-width="2" opacity="0.35"/>
+  </svg>
+
+  <div class="reveal" style="margin-bottom:clamp(14px,2vh,20px); display:flex; align-items:center; justify-content:center; gap:14px;">
+    <!-- brand mark with rotating radar -->
+    <svg width="64" height="64" viewBox="0 0 100 100">
+      <defs>
+        <radialGradient id="radarG" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.35"/>
+          <stop offset="60%" stop-color="#6c63ff" stop-opacity="0.06"/>
+          <stop offset="100%" stop-color="#6c63ff" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#6c63ff" stroke-width="1.4" opacity="0.3"/>
+      <circle cx="50" cy="50" r="32" fill="none" stroke="#6c63ff" stroke-width="1" opacity="0.22"/>
+      <circle cx="50" cy="50" r="18" fill="none" stroke="#6c63ff" stroke-width="1" opacity="0.15"/>
+      <g class="radar-svg" style="transform-box: fill-box; transform-origin: 50% 50%;">
+        <path d="M 50 50 L 50 4 A 46 46 0 0 1 92 36 Z" fill="url(#radarG)"/>
+      </g>
+      <circle cx="50" cy="50" r="3.6" fill="#f5c542"/>
+    </svg>
+    <span class="tag tag-accent" style="font-size:0.78rem; padding:0.36rem 0.9rem; border-radius:100px;">PRODUCT OVERVIEW</span>
+  </div>
+
+  <h1 class="slide__display reveal">
+    <span class="shimmer-text">Wi-Fi que paga<br>a conta.</span>
+  </h1>
+
+  <div class="reveal" style="margin-top:clamp(18px,3vh,28px); max-width:920px;">
+    <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(1.1rem, 2vw, 1.55rem); color:var(--text-dim); line-height:1.45;">
+      MKT WiFi &mdash; a plataforma <strong style="color:var(--accent); font-style:normal; font-family:var(--font-body); font-weight:600;">multi-tenant SaaS</strong> que transforma redes captivas em ativos geradores de receita.
+    </p>
+  </div>
+
+  <div class="reveal" style="margin-top:clamp(20px,3vh,30px); display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap;">
+    <span class="tag tag-accent">Captive Portal</span>
+    <span class="tag tag-gold">4 Modelos de Monetização</span>
+    <span class="tag tag-green">First-Party Data</span>
+    <span class="tag tag-cyan">MikroTik Fleet</span>
+  </div>
+
+  <div class="reveal" style="margin-top:auto; padding-top:clamp(28px,4vh,40px);">
+    <p style="font-family:var(--font-mono); font-size:clamp(0.68rem,0.9vw,0.78rem); letter-spacing:0.18em; text-transform:uppercase; color:var(--text-dim);">
+       &middot; Multi-tenant SaaS &middot; Brasil 2026
+    </p>
+  </div>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 2 — PROBLEM / HOOK                                     -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">01 &middot; O Problema</span></div>
+  <h2 class="slide__heading reveal">
+    O <span style="color:var(--red); font-style:italic;">blind spot</span> do<br>tráfego físico.
+  </h2>
+  <p class="slide__lede reveal" style="margin-bottom:clamp(18px,3vh,28px);">
+    Cafés, lojas, eventos, hotéis e shoppings veem clientes <em>entrarem e saírem</em> sem capturar nada. O Wi-Fi de cortesia &mdash; pago todo mês na conta de luz &mdash; é hoje um <strong style="color:var(--text); font-style:normal; font-family:var(--font-body); font-weight:600;">custo passivo de infraestrutura</strong>.
+  </p>
+
+  <div class="grid-3 reveal">
+    <div class="card card--red">
+      <span class="eyebrow">Custo passivo</span>
+      <h4>Wi-Fi paga a si mesmo</h4>
+      <p>Roteador, link, suporte. Mês a mês. Sem retorno mensurável.</p>
+    </div>
+    <div class="card card--red">
+      <span class="eyebrow">Sem dados</span>
+      <h4>Quem entrou hoje?</h4>
+      <p>Demografia desconhecida. Sem idade, gênero ou bairro. Decisões por intuição.</p>
+    </div>
+    <div class="card card--red">
+      <span class="eyebrow">Sem canal</span>
+      <h4>Zero ponto de contato</h4>
+      <p>Nenhuma forma de retornar ao visitante após a saída &mdash; nenhum funil de remarketing.</p>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      Em paralelo, anunciantes pagam alto por <strong>atenção qualificada</strong>: o usuário em loja, no momento da decisão, é o segmento mais valioso do funil.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-red">Custo Passivo</span>
+      <span class="tag tag-orange">Sem Dados</span>
+      <span class="tag tag-silver">Atenção Qualificada</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 3 — SOLUTION / 3 PILLARS                                -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">02 &middot; A Solução</span></div>
+  <h2 class="slide__heading reveal">Três pilares. Um produto.</h2>
+  <p class="slide__lede reveal">
+    MKT WiFi transforma o Wi-Fi captivo em um sistema integrado de receita, dados e operação &mdash; rodando como SaaS multi-tenant.
+  </p>
+
+  <div class="grid-3 reveal" style="flex:1; align-content:center;">
+    <div class="card card--gold">
+      <span class="eyebrow">Pilar 01</span>
+      <h4>Monetização por vídeo</h4>
+      <p>Anúncio não-pulável de <strong style="color:var(--gold); font-family:var(--font-body); font-weight:700; font-style:normal;">30s</strong> em troca de <strong style="color:var(--gold); font-family:var(--font-body); font-weight:700; font-style:normal;">30 min</strong> de internet.</p>
+      <ul>
+        <li>4 modelos de plano</li>
+        <li>CPV, Pacote, Híbrido, Mensal</li>
+        <li>Renovação por novo anúncio (60s)</li>
+      </ul>
+      
+    </div>
+    <div class="card card--green">
+      <span class="eyebrow">Pilar 02</span>
+      <h4>Captura de leads (1P&nbsp;Data)</h4>
+      <p>Formulário <strong style="color:var(--green); font-family:var(--font-body); font-weight:700; font-style:normal;">100% anonimizado</strong> &mdash; 4 campos. Demografia em tempo real.</p>
+      <ul>
+        <li>Nome, faixa etária, gênero, bairro</li>
+        <li>Sem telefone, e-mail, CPF ou MAC</li>
+        <li>Consent LGPD obrigatório</li>
+      </ul>
+
+    </div>
+    <div class="card card--cyan">
+      <span class="eyebrow">Pilar 03</span>
+      <h4>Frota MikroTik gerenciada</h4>
+      <p>Cada dispositivo monitorado: <strong style="color:var(--cyan); font-family:var(--font-body); font-weight:700; font-style:normal;">CPU, RAM, usuários, banda</strong>. Defaults prontos para 192.168.88.1:8728.</p>
+      <ul>
+        <li>Visão por venue e por org</li>
+        <li>Refresh sob demanda</li>
+        <li>Sessão padrão: 30 min</li>
+      </ul>
+
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      O resultado é um único deployment que entrega <strong>receita + dados + operação</strong> &mdash; sem provisionamento manual por cliente, sem schemas separados, sem pacote de relacionamento custom.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-gold">Monetização</span>
+      <span class="tag tag-green">First-Party Data</span>
+      <span class="tag tag-cyan">Fleet Mgmt</span>
+      <span class="tag tag-accent">Multi-tenant</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 4 — THREE AUDIENCE TIERS                                -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">03 &middot; Audiências</span></div>
+  <h2 class="slide__heading reveal">Três perfis. Um <span style="color:var(--accent);">organization_id</span>.</h2>
+  <p class="slide__lede reveal">
+    O acesso ao produto é segmentado por papel &mdash; cada operador (tenant) controla suas equipes, e cada equipe vê apenas o que precisa.
+  </p>
+
+  <div class="grid-3 reveal" style="flex:1; align-content:center;">
+    <div class="card card--gold">
+      <span class="eyebrow">Papel 01 </span>
+      <h4>Administrador</h4>
+      <p>Operador-admin. Acesso completo ao SPA: campanhas, leads, dispositivos, monetização, relatórios.</p>
+      <ul>
+        <li>CRUD de campanhas</li>
+        <li>Configura plano de monetização</li>
+        <li>Gerencia equipamentos MikroTik</li>
+      </ul>
+      <div class="footnote">SPA admin &middot; subdomínio acme.mktwifi.com.br</div>
+    </div>
+    <div class="card">
+      <span class="eyebrow">Papel 02 </span>
+      <h4>Anunciante</h4>
+      <p>Visão somente-leitura da performance da própria campanha &mdash; CTR, views, demografia agregada.</p>
+      <ul>
+        <li>Read-only por campanha</li>
+        <li>Recebe notificações de marcos</li>
+        <li>Exporta relatórios</li>
+      </ul>
+      <div class="footnote">Acesso restrito por escopo</div>
+    </div>
+    <div class="card card--cyan">
+      <span class="eyebrow">Papel 03 </span>
+      <h4>Visualizador</h4>
+      <p>Dashboards somente-leitura para stakeholders comerciais e parceiros.</p>
+      <ul>
+        <li>Read-only no dashboard</li>
+        <li>Sem acesso a configurações</li>
+        <li>Sem acesso a leads brutos</li>
+      </ul>
+      <div class="footnote">Compliance-friendly</div>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      Há ainda o <strong>visitante anônimo</strong> &mdash; o end-user do captive portal &mdash; que <em>nunca</em> recebe credenciais e nunca aparece como conta. Coleta zero PII por design.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-gold">Administrador</span>
+      <span class="tag tag-accent">Anunciante</span>
+      <span class="tag tag-cyan">Visualizador</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 5 — END-USER JOURNEY (5-STEP SVG)                       -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">04 &middot; Captive Portal &middot; FR-020 &rarr; FR-039</span></div>
+  <h2 class="slide__heading reveal">Do toque na rede ao acesso liberado em <span style="color:var(--accent);">5 passos</span>.</h2>
+
+  <div class="reveal" style="flex:1; display:flex; align-items:center; justify-content:center; padding:clamp(8px,1.5vh,16px) 0;">
+    <svg viewBox="0 0 1240 360" preserveAspectRatio="xMidYMid meet" style="width:100%; max-height:clamp(280px, 50vh, 460px);">
+      <defs>
+        <linearGradient id="arrowG" x1="0%" x2="100%">
+          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#f5c542" stop-opacity="0.7"/>
+        </linearGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Node 1: Connecting -->
+      <g transform="translate(20, 50)">
+        <rect x="0" y="0" width="190" height="240" rx="22" class="ios-frame-fill"/>
+        <rect x="14" y="40" width="162" height="186" rx="6" class="ios-frame-screen"/>
+        <circle cx="95" cy="120" r="22" fill="none" stroke="#6c63ff" stroke-width="1.6" opacity="0.55"/>
+        <circle cx="95" cy="120" r="34" fill="none" stroke="#6c63ff" stroke-width="1.2" opacity="0.32"/>
+        <circle cx="95" cy="120" r="46" fill="none" stroke="#6c63ff" stroke-width="0.8" opacity="0.18"/>
+        <circle cx="95" cy="120" r="4" fill="#f5c542"/>
+        <text x="95" y="172" text-anchor="middle" font-family="'Instrument Serif',serif" font-size="14" font-style="italic" fill="#e8eaf6">Conectando…</text>
+        <text x="95" y="196" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">Verificando rede…</text>
+        <!-- speaker / camera notch -->
+        <rect x="76" y="14" width="38" height="6" rx="3" fill="#0d0f1a"/>
+        <text x="95" y="312" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="20" fill="#6c63ff">1 &middot; Connecting</text>
+        <text x="95" y="334" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#7b82a6">~3,1s</text>
+      </g>
+
+      <!-- Arrow 1 -->
+      <g filter="url(#glow)">
+        <path d="M 218 170 L 248 170" stroke="url(#arrowG)" stroke-width="2.2" fill="none"/>
+        <path d="M 244 165 L 252 170 L 244 175 Z" fill="#f5c542"/>
+      </g>
+
+      <!-- Node 2: Form -->
+      <g transform="translate(258, 50)">
+        <rect x="0" y="0" width="190" height="240" rx="22" class="ios-frame-fill"/>
+        <rect x="14" y="40" width="162" height="186" rx="6" class="ios-frame-screen"/>
+        <rect x="76" y="14" width="38" height="6" rx="3" fill="#0d0f1a"/>
+        <!-- form fields -->
+        <text x="24" y="58" font-family="'Fira Code',monospace" font-size="9" fill="#7b82a6">Nome</text>
+        <rect x="24" y="64" width="142" height="18" rx="4" fill="#161928" stroke="#6c63ff" stroke-width="0.6" opacity="0.7"/>
+        <text x="24" y="100" font-family="'Fira Code',monospace" font-size="9" fill="#7b82a6">Faixa etária</text>
+        <g font-family="'Fira Code',monospace" font-size="8" fill="#e8eaf6">
+          <rect x="24" y="106" width="32" height="14" rx="3" fill="#6c63ff" opacity="0.25"/><text x="40" y="116" text-anchor="middle">18-24</text>
+          <rect x="60" y="106" width="32" height="14" rx="3" fill="#161928" stroke="#2a2f4a" stroke-width="0.5"/><text x="76" y="116" text-anchor="middle">25-34</text>
+          <rect x="96" y="106" width="32" height="14" rx="3" fill="#161928" stroke="#2a2f4a" stroke-width="0.5"/><text x="112" y="116" text-anchor="middle">35-50</text>
+          <rect x="132" y="106" width="32" height="14" rx="3" fill="#161928" stroke="#2a2f4a" stroke-width="0.5"/><text x="148" y="116" text-anchor="middle">50+</text>
+        </g>
+        <text x="24" y="138" font-family="'Fira Code',monospace" font-size="9" fill="#7b82a6">Gênero &middot; Bairro</text>
+        <rect x="24" y="144" width="142" height="14" rx="3" fill="#161928" stroke="#2a2f4a" stroke-width="0.5"/>
+        <rect x="24" y="162" width="142" height="14" rx="3" fill="#161928" stroke="#2a2f4a" stroke-width="0.5"/>
+        <!-- consent + submit -->
+        <rect x="24" y="184" width="10" height="10" rx="2" fill="#6c63ff"/>
+        <text x="40" y="193" font-family="'Fira Code',monospace" font-size="8" fill="#e8eaf6">Aceito a LGPD</text>
+        <rect x="24" y="202" width="142" height="18" rx="9" fill="#6c63ff"/>
+        <text x="95" y="214" text-anchor="middle" font-family="'Fira Code',monospace" font-size="9" fill="#fff" font-weight="600">CONECTAR</text>
+        <text x="95" y="312" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="20" fill="#6c63ff">2 &middot; Form</text>
+        <text x="95" y="334" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#7b82a6">4 campos &middot; LGPD</text>
+      </g>
+
+      <!-- Arrow 2 -->
+      <g filter="url(#glow)">
+        <path d="M 456 170 L 486 170" stroke="url(#arrowG)" stroke-width="2.2" fill="none"/>
+        <path d="M 482 165 L 490 170 L 482 175 Z" fill="#f5c542"/>
+      </g>
+
+      <!-- Node 3: Ad -->
+      <g transform="translate(496, 50)">
+        <rect x="0" y="0" width="190" height="240" rx="22" class="ios-frame-fill"/>
+        <rect x="14" y="40" width="162" height="186" rx="6" class="ios-frame-screen"/>
+        <rect x="76" y="14" width="38" height="6" rx="3" fill="#0d0f1a"/>
+        <!-- video frame -->
+        <rect x="24" y="60" width="142" height="92" rx="4" fill="#0a0c14" stroke="#6c63ff" stroke-width="0.6"/>
+        <polygon points="80,90 80,122 110,106" fill="#f5c542"/>
+        <!-- progress -->
+        <rect x="24" y="158" width="142" height="3" rx="1.5" fill="#161928"/>
+        <rect x="24" y="158" width="42" height="3" rx="1.5" fill="#f5c542"/>
+        <text x="24" y="178" font-family="'Fira Code',monospace" font-size="9" fill="#7b82a6">00:09 / 00:30</text>
+        <text x="166" y="178" text-anchor="end" font-family="'Fira Code',monospace" font-size="8" fill="#ff6b6b">não-pulável</text>
+        <text x="95" y="208" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="12" fill="#f5c542">Anúncio do parceiro</text>
+        <text x="95" y="312" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="20" fill="#f5c542">3 &middot; Ad</text>
+        <text x="95" y="334" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#7b82a6">30s &middot; renew 60s</text>
+      </g>
+
+      <!-- Arrow 3 -->
+      <g filter="url(#glow)">
+        <path d="M 694 170 L 724 170" stroke="url(#arrowG)" stroke-width="2.2" fill="none"/>
+        <path d="M 720 165 L 728 170 L 720 175 Z" fill="#f5c542"/>
+      </g>
+
+      <!-- Node 4: Connected -->
+      <g transform="translate(734, 50)">
+        <rect x="0" y="0" width="190" height="240" rx="22" class="ios-frame-fill"/>
+        <rect x="14" y="40" width="162" height="186" rx="6" class="ios-frame-screen"/>
+        <rect x="76" y="14" width="38" height="6" rx="3" fill="#0d0f1a"/>
+        <!-- circular timer -->
+        <circle cx="95" cy="120" r="42" fill="none" stroke="#161928" stroke-width="6"/>
+        <circle cx="95" cy="120" r="42" fill="none" stroke="#00d4aa" stroke-width="6" stroke-linecap="round" stroke-dasharray="170 264" transform="rotate(-90 95 120)"/>
+        <text x="95" y="118" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="22" fill="#e8eaf6">28:14</text>
+        <text x="95" y="134" text-anchor="middle" font-family="'Fira Code',monospace" font-size="8" fill="#7b82a6">restantes</text>
+        <text x="95" y="184" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="12" fill="#00d4aa">Aproveite, Maria!</text>
+        <text x="95" y="312" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="20" fill="#00d4aa">4 &middot; Connected</text>
+        <text x="95" y="334" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#7b82a6">30 min de internet</text>
+      </g>
+
+      <!-- Arrow 4 -->
+      <g filter="url(#glow)">
+        <path d="M 932 170 L 962 170" stroke="url(#arrowG)" stroke-width="2.2" fill="none"/>
+        <path d="M 958 165 L 966 170 L 958 175 Z" fill="#f5c542"/>
+      </g>
+
+      <!-- Node 5: Renew -->
+      <g transform="translate(972, 50)">
+        <rect x="0" y="0" width="190" height="240" rx="22" class="ios-frame-fill"/>
+        <rect x="14" y="40" width="162" height="186" rx="6" class="ios-frame-screen"/>
+        <rect x="76" y="14" width="38" height="6" rx="3" fill="#0d0f1a"/>
+        <!-- expired -->
+        <text x="95" y="80" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="14" fill="#ff6b6b">Tempo encerrado</text>
+        <circle cx="95" cy="124" r="32" fill="none" stroke="#f5c542" stroke-width="2" opacity="0.7"/>
+        <text x="95" y="118" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="14" fill="#f5c542">+30 min</text>
+        <text x="95" y="134" text-anchor="middle" font-family="'Fira Code',monospace" font-size="7" fill="#7b82a6">após renovar</text>
+        <rect x="24" y="180" width="142" height="22" rx="11" fill="#f5c542"/>
+        <text x="95" y="194" text-anchor="middle" font-family="'Fira Code',monospace" font-size="9" fill="#0d0f1a" font-weight="700">ASSISTIR E RENOVAR</text>
+        <text x="95" y="312" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="20" fill="#f5c542">5 &middot; Renew</text>
+        <text x="95" y="334" text-anchor="middle" font-family="'Fira Code',monospace" font-size="11" fill="#7b82a6">novo anúncio 60s</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      Coletamos apenas: <strong>nome &middot; faixa etária &middot; gênero &middot; bairro</strong>. Sem telefone, e-mail, CPF ou MAC visível. 
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-gold">5 passos</span>
+      <span class="tag tag-red">Não-pulável</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 6 — LGPD BY DESIGN                                      -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">05 &middot; LGPD by Design</span></div>
+  <h2 class="slide__heading reveal">Privacy-by-design.</h2>
+  <p class="slide__lede reveal">
+    O captive portal coleta apenas o suficiente para gerar valor de marketing &mdash; e nada que permita re-identificação. Três camadas de garantia, validadas em código e em CI.
+  </p>
+
+  <div class="grid-3 reveal" style="flex:1; align-content:center;">
+    <div class="card card--green">
+      <span class="eyebrow">Coletamos</span>
+      <h4>Apenas 4 campos anônimos</h4>
+      <ul>
+        <li><strong>Nome</strong> (primeiro nome)</li>
+        <li><strong>Faixa etária</strong> &mdash; 18-24 / 25-34 / 35-50 / 50+</li>
+        <li><strong>Gênero</strong> &mdash; Feminino / Masculino / Prefiro não informar</li>
+        <li><strong>Bairro</strong> &mdash; Centro / Z. Norte / Sul / Leste / Oeste / Praia</li>
+      </ul>
+      <div class="footnote">+ checkbox de consentimento obrigatório</div>
+    </div>
+    <div class="card card--red">
+      <span class="eyebrow">Não coletamos</span>
+      <h4>Lista proibida</h4>
+      <ul style="list-style:none;">
+        <li class="forbidden">Telefone</li>
+        <li class="forbidden">E-mail</li>
+        <li class="forbidden">CPF</li>
+        <li class="forbidden">Sobrenome</li>
+        <li class="forbidden">Data de nascimento exata</li>
+        <li class="forbidden">MAC visível ao usuário</li>
+      </ul>
+      
+    </div>
+    <div class="card card--cyan">
+      <span class="eyebrow">Como garantimos</span>
+      <h4>Três camadas</h4>
+      <ul>
+        <li>Pydantic <code style="font-family:var(--font-mono); color:var(--cyan); font-size:0.82em;">extra="forbid"</code></li>
+        <li>Tipos <code style="font-family:var(--font-mono); color:var(--cyan); font-size:0.82em;">Literal[...]</code> nas chips</li>
+        <li><code style="font-family:var(--font-mono); color:var(--cyan); font-size:0.82em;">grep_pii_check.sh</code> em CI</li>
+      </ul>
+      <div class="footnote">bloqueia o PR</div>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      <strong> Condicionado à anonimização &mdash; propagado em alinhamento do projeto, no schema do Lead, e no risco R3 do registro corporativo.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-green">LGPD</span>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 7 — OPERATOR DASHBOARD KPIs                             -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">06 &middot; Dashboard do Operador</span></div>
+  <h2 class="slide__heading reveal">Quatro <span style="color:var(--accent);">KPIs heroicos</span>. Uma visão.</h2>
+  <p class="slide__lede reveal">
+    Ao logar como Administrador, o operador vê em segundos onde a rede está, onde o investimento está, e onde a frota está respondendo &mdash; tudo agregado por <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.85em;">organization_id</code>.
+    <div class="footnote">Dados fictícios, para ilustração.</div>
+  </p>
+
+  <div class="grid-4 reveal" style="flex:1; align-content:center;">
+    <div class="kpi">
+      <div class="lbl">Pessoas atingidas (mês)</div>
+      <div class="num">12.480</div>
+      <div class="delta up">▲ 18,4% vs mês anterior</div>
+      <p class="desc">Visitantes únicos que assistiram ao anúncio e completaram o fluxo.</p>
+    </div>
+    <div class="kpi kpi--gold">
+      <div class="lbl">Campanhas ativas</div>
+      <div class="num">7</div>
+      <div class="delta up">▲ +2 nesta semana</div>
+      <p class="desc">Anúncios em rotação. Pausa, edição e nova campanha em 1 clique.</p>
+    </div>
+    <div class="kpi kpi--green">
+      <div class="lbl">Investimento total</div>
+      <div class="num">R$&nbsp;48.320</div>
+      <div class="delta up">▲ 9,1% vs mês anterior</div>
+      <p class="desc">Soma do investimento dos parceiros anunciantes neste período.</p>
+    </div>
+    <div class="kpi kpi--cyan">
+      <div class="lbl">Dispositivos online</div>
+      <div class="num">14<span style="font-size:0.5em; color:var(--text-dim);">/16</span></div>
+      <div class="delta live">● ao vivo</div>
+      <p class="desc">MikroTik conectados agora. Refresh sob demanda &middot; padrão 192.168.88.1:8728.</p>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      Cada KPI é um <strong>endpoint async</strong> (<code style="font-family:var(--font-mono); color:var(--accent); font-size:0.86em;">GET /api/kpis</code>) com filtro por tenant aplicado no Postgres &mdash; o admin vê apenas a operação dele, sem nunca tocar dados de outro operador.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-gold">/api/kpis</span>
+      <span class="tag tag-green">Tenant-scoped</span>
+      <span class="tag tag-cyan">Live</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 8 — CAMPAIGN MANAGEMENT                                 -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">07 &middot; Campanhas</span></div>
+  <h2 class="slide__heading reveal">CRUD completo. Em <span style="color:var(--accent);">cards</span> ou tabela.</h2>
+  <p class="slide__lede reveal">
+    O operador cria, edita, pausa e encerra anúncios sem sair da tela &mdash; com filtros por status e duas visualizações (Cards / Tabela).
+  </p>
+
+  <div class="grid-2 reveal" style="flex:1; align-content:center;">
+    <!-- Anatomy of a campaign card -->
+    <div class="card" style="background:linear-gradient(135deg, var(--surface) 0%, rgba(108,99,255,0.04) 100%); border-color:var(--border-bright);">
+      <span class="eyebrow">Anatomia do card</span>
+      <h4>Campanha #C-204 &middot; Cliniscan</h4>
+      <div style="display:flex; gap:0.5rem; margin-top:0.4rem;">
+        <span class="tag tag-green">Ativa</span>
+        <span class="tag tag-gold">CPV</span>
+        <span class="tag tag-accent">30s</span>
+      </div>
+      <ul style="margin-top:0.6rem;">
+        <li>Período: 01/05/2026 &mdash; 31/05/2026</li>
+        <li>Investimento: <strong>R$ 8.400,00</strong></li>
+        <li>Views entregues: 4.218 / 12.000</li>
+        <li>CTR: 6,2% &middot; Conversão estimada: alta</li>
+      </ul>
+      <div style="display:flex; gap:0.5rem; margin-top:0.6rem;">
+        <button class="cta-btn" style="font-size:0.7rem; padding:0.45rem 0.9rem; background:var(--accent-dim); color:var(--accent);">EDITAR</button>
+        <button class="cta-btn" style="font-size:0.7rem; padding:0.45rem 0.9rem; background:var(--orange-dim); color:var(--orange);">PAUSAR</button>
+      </div>
+
+    </div>
+
+    <!-- Status filters + actions -->
+    <div style="display:flex; flex-direction:column; gap:clamp(10px,1.5vh,16px);">
+      <div class="card">
+        <span class="eyebrow">Filtros de status </span>
+        <h4>Quatro abas</h4>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.4rem;">
+          <span class="tag tag-accent">Todas</span>
+          <span class="tag tag-green">Ativas</span>
+          <span class="tag tag-orange">Pausadas</span>
+          <span class="tag tag-silver">Encerradas</span>
+        </div>
+        <p style="margin-top:0.6rem;">Cada aba conta os itens automaticamente. Mudança não-retroativa em campanhas em andamento (FR-122).</p>
+      </div>
+      <div class="card card--gold">
+        <span class="eyebrow">Operações </span>
+        <h4>CRUD em 1 clique</h4>
+        <ul>
+          <li><strong>Nova</strong> &mdash; modal com nome, vídeo, período, investimento, modelo</li>
+          <li><strong>Editar</strong> &mdash; PATCH parcial, dispara notificação</li>
+          <li><strong>Pausar/Retomar</strong> &mdash; toggle de status</li>
+          <li><strong>Encerrar</strong> &mdash; soft delete, mantém histórico para relatórios</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      Backend: <strong>5 endpoints</strong> &mdash; <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.86em;">GET/POST /api/campaigns</code> e <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.86em;">PATCH/DELETE /api/campaigns/{id}</code> &mdash; todos filtrados por <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.86em;">organization_id</code>.
+    </p>
+    <div class="bottom-bar__tags">
+      
+
+      <span class="tag tag-green">CRUD</span>
+      <span class="tag tag-cyan">Cards/Tabela</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 9 — LEAD / USER BASE                                    -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">08 &middot; Base de Leads</span></div>
+  <h2 class="slide__heading reveal">Demografia em tempo real, <span style="color:var(--green);">sem PII</span>.</h2>
+  <p class="slide__lede reveal">
+    Cada submissão do portal vira uma linha anonimizada. O operador vê quem está conectando, de onde, e em qual perfil &mdash; sem tocar em telefone, e-mail ou CPF.
+  </p>
+
+  <div class="grid-2 reveal" style="flex:1; align-content:center;">
+    <!-- Lead list preview -->
+    <div class="card">
+      <span class="eyebrow">Lista de leads &middot; busca por bairro</span>
+      <h4>Conexões recentes</h4>
+      <table style="width:100%; margin-top:0.4rem; font-size:clamp(0.78rem, 0.95vw, 0.86rem); border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border-bright);">
+            <th style="text-align:left; padding:0.4rem 0.5rem; font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim);">Nome</th>
+            <th style="text-align:left; padding:0.4rem 0.5rem; font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim);">Faixa</th>
+            <th style="text-align:left; padding:0.4rem 0.5rem; font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim);">Gênero</th>
+            <th style="text-align:left; padding:0.4rem 0.5rem; font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim);">Bairro</th>
+            <th style="text-align:right; padding:0.4rem 0.5rem; font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim);">Conexões</th>
+          </tr>
+        </thead>
+        <tbody style="font-family:var(--font-body); color:var(--text);">
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.36rem 0.5rem; font-family:var(--font-display); font-style:italic; color:var(--accent);">Maria</td><td style="padding:0.36rem 0.5rem;">25-34</td><td style="padding:0.36rem 0.5rem;">Feminino</td><td style="padding:0.36rem 0.5rem;">Centro</td><td style="text-align:right; padding:0.36rem 0.5rem; color:var(--green);">4</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.36rem 0.5rem; font-family:var(--font-display); font-style:italic; color:var(--accent);">João</td><td style="padding:0.36rem 0.5rem;">35-50</td><td style="padding:0.36rem 0.5rem;">Masculino</td><td style="padding:0.36rem 0.5rem;">Zona Sul</td><td style="text-align:right; padding:0.36rem 0.5rem; color:var(--green);">2</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.36rem 0.5rem; font-family:var(--font-display); font-style:italic; color:var(--accent);">Aline</td><td style="padding:0.36rem 0.5rem;">18-24</td><td style="padding:0.36rem 0.5rem;">Feminino</td><td style="padding:0.36rem 0.5rem;">Praia</td><td style="text-align:right; padding:0.36rem 0.5rem; color:var(--green);">7</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.36rem 0.5rem; font-family:var(--font-display); font-style:italic; color:var(--accent);">Renato</td><td style="padding:0.36rem 0.5rem;">50+</td><td style="padding:0.36rem 0.5rem;">Masculino</td><td style="padding:0.36rem 0.5rem;">Zona Norte</td><td style="text-align:right; padding:0.36rem 0.5rem; color:var(--green);">1</td></tr>
+          <tr><td style="padding:0.36rem 0.5rem; font-family:var(--font-display); font-style:italic; color:var(--accent);">Camila</td><td style="padding:0.36rem 0.5rem;">25-34</td><td style="padding:0.36rem 0.5rem;">Prefiro não informar</td><td style="padding:0.36rem 0.5rem;">Zona Leste</td><td style="text-align:right; padding:0.36rem 0.5rem; color:var(--green);">3</td></tr>
+        </tbody>
+      </table>
+      <div class="footnote">Nenhuma coluna sensível &mdash; nem em UI, nem em export</div>
+    </div>
+
+    <!-- Demographics aggregates -->
+    <div style="display:flex; flex-direction:column; gap:clamp(10px,1.5vh,14px);">
+      <div class="card card--green">
+        <span class="eyebrow">Agregados &middot; tempo real</span>
+        <h4>Demografia da operação</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.4rem;">
+          <div>
+            <div style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.8rem, 3.4vw, 2.6rem); color:var(--green); line-height:1;">31,4</div>
+            <div style="font-family:var(--font-mono); font-size:0.66rem; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase;">idade média</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.8rem, 3.4vw, 2.6rem); color:var(--green); line-height:1;">58%</div>
+            <div style="font-family:var(--font-mono); font-size:0.66rem; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase;">público feminino</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.8rem, 3.4vw, 2.6rem); color:var(--green); line-height:1;">62%</div>
+            <div style="font-family:var(--font-mono); font-size:0.66rem; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase;">zona Centro+Sul</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-display); font-style:italic; font-size:clamp(1.8rem, 3.4vw, 2.6rem); color:var(--green); line-height:1;">2,8</div>
+            <div style="font-family:var(--font-mono); font-size:0.66rem; color:var(--text-dim); letter-spacing:0.12em; text-transform:uppercase;">média conexões/lead</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Live</span>
+        <h4>Quem está conectado agora</h4>
+        <p>Endpoint <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.86em;">GET /api/users/live</code> retorna sessões abertas. Lista anonimizada com primeiro nome + bairro &mdash; sem rastreamento individual.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      A base de leads é <strong>derivada do consentimento LGPD</strong> &mdash; cada linha existe porque o visitante aceitou. Nada de scraping, nada de PII, nada de re-identificação.
+    </p>
+    <div class="bottom-bar__tags">
+      
+     
+      <span class="tag tag-gold">Anonimizado</span>
+      <span class="tag tag-cyan">Demografia</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 10 — WI-FI FLEET                                        -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">09 &middot; Frota Wi-Fi</span></div>
+  <h2 class="slide__heading reveal">Frota MikroTik <span style="color:var(--cyan);">monitorada</span>, sob demanda.</h2>
+  <p class="slide__lede reveal">
+    Cada equipamento aparece como card com saúde em tempo real. Refresh manual sob demanda &middot; integração via <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.85em;">librouteros</code> (mock adapter shipped).
+  </p>
+
+  <div class="grid-3 reveal" style="flex:1; align-content:center;">
+    <div class="card card--cyan">
+      <span class="eyebrow">Loja Centro</span>
+      <h4>MikroTik hAP ax²</h4>
+      <div style="display:flex; gap:0.5rem;"><span class="tag tag-green">● online</span></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.5rem; font-family:var(--font-mono); font-size:0.78rem;">
+        <div><span style="color:var(--text-dim);">CPU</span> <strong style="color:var(--green);">23%</strong></div>
+        <div><span style="color:var(--text-dim);">RAM</span> <strong style="color:var(--green);">41%</strong></div>
+        <div><span style="color:var(--text-dim);">Users</span> <strong style="color:var(--accent);">38</strong></div>
+        <div><span style="color:var(--text-dim);">Banda</span> <strong style="color:var(--cyan);">42 Mb/s</strong></div>
+      </div>
+      <div class="footnote">192.168.88.1:8728 &middot; sessão 30 min</div>
+    </div>
+    <div class="card card--cyan">
+      <span class="eyebrow">Loja Praia</span>
+      <h4>MikroTik hAP ax³</h4>
+      <div style="display:flex; gap:0.5rem;"><span class="tag tag-green">● online</span></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.5rem; font-family:var(--font-mono); font-size:0.78rem;">
+        <div><span style="color:var(--text-dim);">CPU</span> <strong style="color:var(--orange);">68%</strong></div>
+        <div><span style="color:var(--text-dim);">RAM</span> <strong style="color:var(--green);">52%</strong></div>
+        <div><span style="color:var(--text-dim);">Users</span> <strong style="color:var(--accent);">94</strong></div>
+        <div><span style="color:var(--text-dim);">Banda</span> <strong style="color:var(--cyan);">88 Mb/s</strong></div>
+      </div>
+      <div class="footnote">Pico de fluxo &middot; alerta amarelo</div>
+    </div>
+    <div class="card" style="border-color:rgba(255,107,107,0.22);">
+      <span class="eyebrow" style="color:var(--red);">Shopping ZN</span>
+      <h4>MikroTik RB4011</h4>
+      <div style="display:flex; gap:0.5rem;"><span class="tag tag-red">● offline</span></div>
+      <div style="font-family:var(--font-editorial); font-style:italic; color:var(--text-dim); margin-top:0.5rem;">Última leitura há 14 min &mdash; notificação enviada por WhatsApp ao grupo Operação.</div>
+      <button class="cta-btn" style="font-size:0.7rem; padding:0.45rem 0.9rem; background:var(--accent-dim); color:var(--accent); margin-top:auto;">REFRESH</button>
+      <div class="footnote">POST /api/devices/{id}/refresh</div>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      Defaults prontos para Brasil: <strong>192.168.88.1 : 8728</strong> e sessão de <strong>30 min</strong>. <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.86em;">GET /api/devices</code> + <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.86em;">POST /api/devices/{id}/refresh</code>.
+    </p>
+    <div class="bottom-bar__tags">
+      
+
+
+      <span class="tag tag-green">librouteros</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 11 — MONETIZATION 4 MODELS                              -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">10 &middot; Monetização</span></div>
+  <h2 class="slide__heading reveal">Quatro modelos. Um operador. <span style="color:var(--gold);">Receita previsível</span>.</h2>
+  <p class="slide__lede reveal">
+    O operador escolhe um plano ativo. Mudança de plano <strong style="color:var(--text); font-style:normal; font-family:var(--font-body); font-weight:600;">não é retroativa</strong> &mdash; campanhas em andamento mantêm o modelo original (FR-122).
+  </p>
+
+  <div class="grid-4 reveal" style="flex:1; align-content:center;">
+    <div class="card">
+      <span class="eyebrow">Modelo 01 </span>
+      <h4>Por visualização (CPV)</h4>
+      <div class="price">R$ 0,50</div>
+      <p style="font-family:var(--font-mono); font-size:0.74rem; color:var(--text-dim); letter-spacing:0.05em;">por view</p>
+      <ul>
+        <li>Pay-as-you-grow</li>
+        <li>Sem compromisso fixo</li>
+        <li>Ideal para campanhas pontuais</li>
+      </ul>
+      <div class="footnote">Variável &middot; alinhado a entrega</div>
+    </div>
+    <div class="card card--cyan">
+      <span class="eyebrow">Modelo 02</span>
+      <h4>Pacote de tempo</h4>
+      <div class="price">R$ 100</div>
+      <p style="font-family:var(--font-mono); font-size:0.74rem; color:var(--text-dim); letter-spacing:0.05em;">por 10h Wi-Fi</p>
+      <ul>
+        <li>Bloco de horas pré-pago</li>
+        <li>Receita por bloco</li>
+        <li>Bom para eventos</li>
+      </ul>
+      <div class="footnote">Previsível por evento</div>
+    </div>
+    <div class="card">
+      <span class="eyebrow">Modelo 03</span>
+      <h4>Híbrido</h4>
+      <div class="price" style="font-size:clamp(1.6rem, 2.8vw, 2.2rem);">View + tempo</div>
+      <p style="font-family:var(--font-mono); font-size:0.74rem; color:var(--text-dim); letter-spacing:0.05em;">customizado</p>
+      <ul>
+        <li>CPV + pacote concomitantes</li>
+        <li>Flexibilidade máxima</li>
+        <li>Para operadores grandes</li>
+      </ul>
+      <div class="footnote">Customizado por contrato</div>
+    </div>
+    <div class="card card--gold pulse-glow" style="background:linear-gradient(135deg, var(--surface) 0%, rgba(245,197,66,0.05) 100%);">
+      <span class="eyebrow">Modelo 04</span>
+      <h4>Plano fixo mensal</h4>
+      <div class="price">R$ 299</div>
+      <p style="font-family:var(--font-mono); font-size:0.74rem; color:var(--gold); letter-spacing:0.05em; font-weight:600;">por mês &middot; ARR estável</p>
+      <ul>
+        <li>Custo fixo previsível</li>
+        <li>Churn baixo</li>
+        <li>Ideal para multi-loja</li>
+      </ul>
+      <div class="footnote" style="color:var(--gold);">Recomendado &middot; CFO-friendly</div>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      <strong>FR-122 &middot; não-retroatividade</strong>: trocas de plano deixam campanhas em vôo no modelo antigo até o fim do ciclo. Moeda em pt-BR: <code style="font-family:var(--font-mono); color:var(--gold); font-size:0.86em;">R$ 1.500,00</code> (vírgula decimal, ponto milhar).
+    </p>
+    <div class="bottom-bar__tags">
+      
+      
+      
+      
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 12 — NOTIFICATIONS & REPORTS                            -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">11 &middot; Notificações &amp; Relatórios</span></div>
+  <h2 class="slide__heading reveal">Quem precisa saber, <span style="color:var(--green);">sabe na hora</span>.</h2>
+  <p class="slide__lede reveal">
+    Dois canais (WhatsApp + E-mail), regras configuráveis com toggle, três grupos de destinatários. Relatórios consolidados puxam tudo via <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.85em;">/api/reports</code>.
+  </p>
+
+  <div class="grid-2 reveal" style="flex:1; align-content:center;">
+    <div class="card">
+      <span class="eyebrow">Regras default</span>
+      <h4>Quatro gatilhos prontos</h4>
+      <div style="display:flex; flex-direction:column; gap:0.55rem; margin-top:0.4rem;">
+        <div style="display:flex; align-items:center; gap:0.6rem;"><span class="tag tag-green">WhatsApp</span><span style="font-size:0.86rem;">Equipamento offline &gt; 5 min</span></div>
+        <div style="display:flex; align-items:center; gap:0.6rem;"><span class="tag tag-green">WhatsApp</span><span style="font-size:0.86rem;">Pico de uso &gt; 80% banda</span></div>
+        <div style="display:flex; align-items:center; gap:0.6rem;"><span class="tag tag-blue">E-mail</span><span style="font-size:0.86rem;">Campanha atinge 50% das views</span></div>
+        <div style="display:flex; align-items:center; gap:0.6rem;"><span class="tag tag-blue">E-mail</span><span style="font-size:0.86rem;">Fechamento mensal pronto</span></div>
+      </div>
+      <div class="footnote">Toggle por regra &middot; PATCH /api/notifications/rules/{id}</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:clamp(10px,1.5vh,14px);">
+      <div class="card card--gold">
+        <span class="eyebrow">Grupos de destino/span>
+        <h4>Três times, três visões</h4>
+        <ul>
+          <li><strong>Anunciantes</strong> &mdash; marcos de campanha + relatórios</li>
+          <li><strong>Operação</strong> &mdash; alertas técnicos da frota</li>
+          <li><strong>Comercial</strong> &mdash; fechamentos e oportunidades</li>
+        </ul>
+      </div>
+      <div class="card card--cyan">
+        <span class="eyebrow">Relatórios</span>
+        <h4>Consolidado por período</h4>
+        <p>KPIs, demografia, performance por campanha, saúde da frota &mdash; tudo exportável. Endpoint único <code style="font-family:var(--font-mono); color:var(--cyan); font-size:0.86em;">GET /api/reports</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      Roadmap honesto: o gatilho de regras default já existe; a tela <strong>"Nova regra"</strong> está marcada como <code style="font-family:var(--font-mono); color:var(--orange); font-size:0.86em;">em breve</code> (FR-104) &mdash; o botão aparece, mas o flow de criação ainda não está liberado.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-green">WhatsApp</span>
+      <span class="tag tag-blue">E-mail</span>
+      <span class="tag tag-gold">3 grupos</span>
+      
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 13 — MULTI-TENANT ARCHITECTURE                          -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">12 &middot; Arquitetura</span></div>
+  <h2 class="slide__heading reveal">Um deployment. <span style="color:var(--accent);">N operadores</span>. Zero vazamento.</h2>
+
+  <div class="reveal" style="flex:1; display:flex; align-items:center; justify-content:center; padding:clamp(8px,1.5vh,16px) 0;">
+    <svg viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet" style="width:100%; max-height:clamp(260px, 46vh, 420px);">
+      <defs>
+        <linearGradient id="tnGrad" x1="0%" x2="100%">
+          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#00d4aa" stop-opacity="0.7"/>
+        </linearGradient>
+        <filter id="tnGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Path 1: Admin SPA (top) -->
+      <g>
+        <text x="20" y="30" font-family="'Fira Code',monospace" font-size="11" fill="#6c63ff" font-weight="600">CAMINHO 1 &middot; ADMIN SPA</text>
+        <!-- subdomain box -->
+        <rect x="20" y="44" width="220" height="64" rx="10" fill="#161928" stroke="#6c63ff" stroke-width="1.4"/>
+        <text x="130" y="72" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="18" fill="#e8eaf6">acme.mktwifi.com.br</text>
+        <text x="130" y="92" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">subdomínio</text>
+
+        <path d="M 240 76 L 280 76" stroke="url(#tnGrad)" stroke-width="2" fill="none" filter="url(#tnGlow)"/>
+        <path d="M 276 71 L 284 76 L 276 81 Z" fill="#00d4aa"/>
+
+        <!-- JWT box -->
+        <rect x="284" y="44" width="180" height="64" rx="10" fill="#161928" stroke="#6c63ff" stroke-width="1.4"/>
+        <text x="374" y="72" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="18" fill="#e8eaf6">JWT auth</text>
+        <text x="374" y="92" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">7-day TTL &middot; Bearer</text>
+
+        <path d="M 464 76 L 504 76" stroke="url(#tnGrad)" stroke-width="2" fill="none" filter="url(#tnGlow)"/>
+        <path d="M 500 71 L 508 76 L 500 81 Z" fill="#00d4aa"/>
+      </g>
+
+      <!-- Path 2: Captive Portal (bottom) -->
+      <g>
+        <text x="20" y="160" font-family="'Fira Code',monospace" font-size="11" fill="#f5c542" font-weight="600">CAMINHO 2 &middot; CAPTIVE PORTAL</text>
+        <rect x="20" y="174" width="220" height="64" rx="10" fill="#161928" stroke="#f5c542" stroke-width="1.4"/>
+        <text x="130" y="202" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="16" fill="#e8eaf6">device_id</text>
+        <text x="130" y="222" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">do MikroTik</text>
+
+        <path d="M 240 206 L 280 206" stroke="url(#tnGrad)" stroke-width="2" fill="none" filter="url(#tnGlow)"/>
+        <path d="M 276 201 L 284 206 L 276 211 Z" fill="#00d4aa"/>
+
+        <rect x="284" y="174" width="180" height="64" rx="10" fill="#161928" stroke="#f5c542" stroke-width="1.4"/>
+        <text x="374" y="200" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="14" fill="#e8eaf6">venue_id</text>
+        <text x="374" y="220" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">/api/portal/bootstrap</text>
+
+        <path d="M 464 206 L 504 206" stroke="url(#tnGrad)" stroke-width="2" fill="none" filter="url(#tnGlow)"/>
+        <path d="M 500 201 L 508 206 L 500 211 Z" fill="#00d4aa"/>
+      </g>
+
+      <!-- Convergence: organization_id resolver -->
+      <rect x="508" y="100" width="220" height="84" rx="12" fill="#1c2038" stroke="#00d4aa" stroke-width="1.6" filter="url(#tnGlow)"/>
+      <text x="618" y="132" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="22" fill="#00d4aa">organization_id</text>
+      <text x="618" y="156" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">resolvido na request</text>
+      <text x="618" y="172" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">FK indexado em todas as tabelas</text>
+
+      <!-- Lines from JWT and venue_id to convergence -->
+      <path d="M 464 76 Q 488 76 488 142 L 506 142" stroke="url(#tnGrad)" stroke-width="2" fill="none" filter="url(#tnGlow)"/>
+      <path d="M 464 206 Q 488 206 488 142 L 506 142" stroke="url(#tnGrad)" stroke-width="2" fill="none" filter="url(#tnGlow)"/>
+      <path d="M 502 137 L 510 142 L 502 147 Z" fill="#00d4aa"/>
+
+      <!-- Arrow to RLS box -->
+      <path d="M 728 142 L 768 142" stroke="url(#tnGrad)" stroke-width="2.5" fill="none" filter="url(#tnGlow)"/>
+      <path d="M 764 137 L 772 142 L 764 147 Z" fill="#00d4aa"/>
+
+      <!-- RLS box -->
+      <rect x="772" y="100" width="200" height="84" rx="12" fill="#1c2038" stroke="#6c63ff" stroke-width="1.6" filter="url(#tnGlow)"/>
+      <text x="872" y="132" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="22" fill="#6c63ff">Postgres RLS</text>
+      <text x="872" y="156" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">CREATE POLICY por tabela</text>
+      <text x="872" y="172" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6">filtro a cada query</text>
+
+      <!-- Arrow to outcome -->
+      <path d="M 972 142 L 1010 142" stroke="url(#tnGrad)" stroke-width="2.5" fill="none" filter="url(#tnGlow)"/>
+      <path d="M 1006 137 L 1014 142 L 1006 147 Z" fill="#00d4aa"/>
+
+      <!-- Outcome box -->
+      <rect x="1014" y="92" width="166" height="100" rx="12" fill="#161928" stroke="#00d4aa" stroke-width="1.6"/>
+      <text x="1097" y="122" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="14" fill="#e8eaf6">Apenas linhas</text>
+      <text x="1097" y="142" text-anchor="middle" font-family="'Instrument Serif',serif" font-style="italic" font-size="14" fill="#e8eaf6">do tenant</text>
+      <text x="1097" y="170" text-anchor="middle" font-family="'Fira Code',monospace" font-size="10" fill="#00d4aa" font-weight="600">ZERO VAZAMENTO</text>
+
+      <!-- Foot label -->
+      <g>
+        <text x="20" y="288" font-family="'Fira Code',monospace" font-size="10" fill="#7b82a6" font-weight="600">TABELAS COM FK organization_id (não-exaustivo):</text>
+        <g font-family="'Fira Code',monospace" font-size="10" fill="#e8eaf6">
+          <text x="20" y="310">campaigns &middot; leads &middot; devices &middot; venues &middot; monetization_plans &middot; reports</text>
+        </g>
+        <text x="20" y="334" font-family="'Newsreader',serif" font-style="italic" font-size="11" fill="#7b82a6">Default: Postgres RLS (TD-09). Fallback: SQLAlchemy event-hook para analytics super-user.</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      <strong>Cada operador é um tenant</strong>. Toda tabela owned carrega <code style="font-family:var(--font-mono); color:var(--accent); font-size:0.86em;">organization_id</code> indexado. Resolução: subdomínio para o admin, device_id&rarr;venue&rarr;org para o portal.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-accent">Postgres RLS</span>
+      
+      
+      
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 14 — TECH STACK & API                                   -->
+<!-- ============================================================ -->
+<section class="slide">
+  <div class="reveal"><span class="slide__eyebrow">13 &middot; Stack &amp; API</span></div>
+  <h2 class="slide__heading reveal">21 endpoints. 9 clusters. <span style="color:var(--accent);">Tudo async</span>.</h2>
+
+  <div class="grid-2 reveal" style="flex:1; align-content:center;">
+    <div style="display:flex; flex-direction:column; gap:clamp(10px,1.5vh,14px);">
+      <div class="card">
+        <span class="eyebrow">Tech stack </span>
+        <h4>FastAPI &middot; React &middot; Postgres</h4>
+        <ul>
+          <li><strong>Backend</strong> &mdash; FastAPI + Pydantic v2</li>
+          <li><strong>Admin SPA</strong> &mdash; React 18 + Vite + TS</li>
+          <li><strong>Captive Portal</strong> &mdash; React 18 + Vite + TS (bundle separado)</li>
+          <li><strong>DB / ORM</strong> &mdash; PostgreSQL 14+ (asyncpg) &middot; SQLAlchemy 2.x async + Alembic</li>
+          <li><strong>Sessão</strong> &mdash; JWT, 7-day TTL, localStorage / sessionStorage</li>
+        </ul>
+      </div>
+      <div class="card card--gold">
+        <span class="eyebrow">Por que async?</span>
+        <h4>Concorrência sem bloqueio</h4>
+        <p>I/O do MikroTik, do video player e do banco em paralelo &mdash; um único worker FastAPI atende centenas de portais simultâneos. Sessão ativa fica em memória enquanto o portal estiver em vôo.</p>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--surface); padding-top:clamp(12px,2vh,18px);">
+      <span class="eyebrow">21 endpoints &middot; 9 clusters &middot; backend/main.py</span>
+      <table class="endpoints-table">
+        <thead>
+          <tr>
+            <th>Cluster</th>
+            <th>#</th>
+            <th>Endpoints (resumo)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Auth</td><td>1</td><td>POST /api/auth/login</td></tr>
+          <tr><td>Dashboard</td><td>3</td><td>/api/kpis, /connections/weekly, /demographics</td></tr>
+          <tr><td>Campaigns</td><td>4</td><td>GET/POST/PATCH/DELETE /api/campaigns</td></tr>
+          <tr><td>Users</td><td>2</td><td>/api/users, /api/users/live</td></tr>
+          <tr><td>Devices</td><td>2</td><td>GET /api/devices, POST /refresh</td></tr>
+          <tr><td>Notifications</td><td>3</td><td>/api/notifications/rules, /groups</td></tr>
+          <tr><td>Monetization</td><td>1</td><td>GET /api/monetization</td></tr>
+          <tr><td>Reports</td><td>1</td><td>GET /api/reports</td></tr>
+          <tr class="row-portal"><td>Captive Portal</td><td>4</td><td>/portal/bootstrap · /connect · /ad-complete · /renew</td></tr>
+        </tbody>
+      </table>
+      <div class="footnote">Cluster <strong style="color:var(--gold);">portal</strong> destacado &mdash; toda interação anônima do end-user.</div>
+    </div>
+  </div>
+
+  <div class="bottom-bar reveal">
+    <p class="bottom-bar__text">
+      Run em <strong>1 worker</strong> enquanto sessões ficarem em memória (DESIGN_CAPTIVE_PORTAL.md, Decisão 3). Migração para múltiplos workers requer Redis para a sessão &mdash; trade-off documentado.
+    </p>
+    <div class="bottom-bar__tags">
+      <span class="tag tag-accent">FastAPI</span>
+      <span class="tag tag-gold">Pydantic v2</span>
+      <span class="tag tag-cyan">SQLAlchemy 2.x</span>
+      <span class="tag tag-green">21 endpoints</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 15 — ROADMAP & CLOSING CTA                              -->
+<!-- ============================================================ -->
+<section class="slide" style="text-align:center; align-items:center;">
+  <div class="reveal"><span class="slide__eyebrow">14 &middot; Roadmap &amp; CTA</span></div>
+
+  <h2 class="slide__heading reveal" style="font-size:clamp(40px, 7vw, 84px);">
+    Pronto para transformar Wi-Fi em <span class="gradient-gold">receita</span>?
+  </h2>
+
+  <p class="slide__lede reveal" style="margin:clamp(10px,1.6vh,18px) auto 0; max-width:780px;">
+    MKT WiFi &middot; multi-tenant SaaS &middot; pt-BR &middot; LGPD-ready.
+  </p>
+
+  <!-- Honest roadmap row -->
+  <div class="reveal" style="margin-top:clamp(18px,3vh,28px); display:grid; grid-template-columns:1fr 1fr; gap:clamp(14px,2vw,24px); width:100%; max-width:1000px;">
+    <div class="card card--green" style="text-align:left;">
+      <span class="eyebrow">Em produção agora</span>
+      <h4>Ships hoje</h4>
+      <ul>
+        <li>5-step captive portal &middot; 4 campos LGPD</li>
+        <li>Dashboard 4 KPIs &middot; campanhas CRUD</li>
+        <li>Frota MikroTik (mock adapter, librouteros planejado)</li>
+        <li>4 modelos de monetização &middot; relatórios</li>
+        <li>Notificações WhatsApp + E-mail (regras default)</li>
+      </ul>
+    </div>
+    <div class="card card--red" style="text-align:left;">
+      <span class="eyebrow">Em breve &middot; honesto</span>
+      <h4>Roadmap próximo</h4>
+      <ul>
+        <li>SSO Google + Microsoft (FR-006 &mdash; <code style="font-family:var(--font-mono); color:var(--orange);">em breve</code>)</li>
+        <li>Tela "Nova regra" de notificação (FR-104 &mdash; <code style="font-family:var(--font-mono); color:var(--orange);">em breve</code>)</li>
+        <li>Integração <code style="font-family:var(--font-mono); color:var(--accent);">librouteros</code> real (mock adapter no momento)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="reveal" style="margin-top:clamp(24px,3.5vh,36px);">
+    <button class="cta-btn pulse-glow" style="padding:1.05rem 2.4rem; font-size:clamp(0.95rem, 1.2vw, 1.05rem);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      SOLICITAR ACESSO
+    </button>
+  </div>
+
+  <div class="reveal" style="margin-top:auto; padding-top:clamp(20px,3vh,28px); display:flex; flex-direction:column; gap:0.4rem;">
+    <p style="font-family:var(--font-mono); font-size:clamp(0.7rem,0.92vw,0.78rem); letter-spacing:0.18em; text-transform:uppercase; color:var(--text-dim);">
+      abb_data.ai@mktwifi.com.br &middot; acme.mktwifi.com.br
+    </p>
+    <p style="font-family:var(--font-editorial); font-style:italic; font-size:clamp(0.78rem, 1vw, 0.9rem); color:var(--text-dim);">
+      Wi-Fi que paga a conta. Multi-tenant que escala. LGPD que protege. Pt-BR que conecta.
+    </p>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<script>
+class SlideEngine {
+  constructor() {
+    this.deck = document.getElementById('deck');
+    this.slides = [...document.querySelectorAll('.slide')];
+    this.progress = document.getElementById('progress');
+    this.counter = document.getElementById('counter');
+    this.hints = document.getElementById('hints');
+    this.total = this.slides.length;
+    this.current = 0;
+
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          this.current = this.slides.indexOf(e.target);
+          this.updateChrome();
+        }
+      });
+    }, { root: this.deck, threshold: 0.5 });
+    this.slides.forEach((s) => obs.observe(s));
+
+    document.addEventListener('keydown', (e) => {
+      if (['ArrowDown', 'ArrowRight', 'Space', 'PageDown'].includes(e.code)) {
+        e.preventDefault();
+        this.next();
+      }
+      if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.code)) {
+        e.preventDefault();
+        this.prev();
+      }
+      if (e.code === 'Home') {
+        e.preventDefault();
+        this.goTo(0);
+      }
+      if (e.code === 'End') {
+        e.preventDefault();
+        this.goTo(this.total - 1);
+      }
+      if (e.code === 'Escape') {
+        e.preventDefault();
+        this.goTo(0);
+      }
+    });
+
+    let touchY = 0;
+    this.deck.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+    this.deck.addEventListener('touchend', (e) => {
+      const dy = touchY - e.changedTouches[0].clientY;
+      if (Math.abs(dy) > 50) (dy > 0) ? this.next() : this.prev();
+    }, { passive: true });
+
+    setTimeout(() => this.hints.classList.add('faded'), 4000);
+    this.updateChrome();
+    if (this.slides[0]) this.slides[0].classList.add('visible');
+  }
+
+  goTo(i) { this.slides[i] && this.slides[i].scrollIntoView({ behavior: 'smooth' }); }
+  next() { this.goTo(Math.min(this.current + 1, this.total - 1)); }
+  prev() { this.goTo(Math.max(this.current - 1, 0)); }
+
+  updateChrome() {
+    const pct = ((this.current + 1) / this.total) * 100;
+    this.progress.style.width = pct + '%';
+    this.counter.textContent = (this.current + 1) + ' / ' + this.total;
+  }
+}
+new SlideEngine();
+</script>
+
+</body>
+</html>
