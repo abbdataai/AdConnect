@@ -1,0 +1,6 @@
+# Local files
+notifications.log
+__pycache__/
+.venv/
+*.pyc
+mktwifi.db

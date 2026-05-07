@@ -1,0 +1,40 @@
+# IDE / editor
+.cursor
+.vscode
+.idea
+
+# AI workflow scaffolding — kept local. Only .claude/sdd/ (SDD archives) is committed.
+.claude/agents/
+.claude/dev/
+.claude/settings*.json
+.claude/.DS_Store
+
+# OS / metadata
+.DS_Store
+
+# Transient databases (test artifacts + dev seed)
+*.db
+*.sqlite
+*.sqlite3
+
+# Build artifacts
+dist/
+build/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
